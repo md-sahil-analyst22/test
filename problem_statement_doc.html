@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Statement - Personal Expense Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #e9ecef;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .nav-tab:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .problem-points {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .problem-points li {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            transition: all 0.3s ease;
+        }
+
+        .problem-points li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .problem-points li::before {
+            content: '⚠️';
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .objective-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .objective-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #27ae60;
+            transition: all 0.3s ease;
+        }
+
+        .objective-list li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .objective-list li::before {
+            content: '🎯';
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .requirement-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border-top: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .requirement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .requirement-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .requirement-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .requirement-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .requirement-card li::before {
+            content: '✓';
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .milestone {
+            position: relative;
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .milestone:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .milestone:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .milestone-content {
+            width: 45%;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .milestone-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .milestone-dot {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid white;
+            box-shadow: 0 0 0 4px #667eea;
+            z-index: 1;
+        }
+
+        .milestone-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .scope-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .scope-card {
+            padding: 20px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .in-scope {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+        }
+
+        .out-scope {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 5px solid #dc3545;
+        }
+
+        .scope-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .scope-card h3 {
+            margin-bottom: 15px;
+        }
+
+        .scope-card ul {
+            list-style: none;
+        }
+
+        .scope-card li {
+            padding: 8px 0;
+        }
+
+        .in-scope li::before {
+            content: '✓';
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .out-scope li::before {
+            content: '✗';
+            color: #dc3545;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .constraints-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .constraint-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border-top: 4px solid #f39c12;
+            transition: all 0.3s ease;
+        }
+
+        .constraint-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .constraint-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .success-criteria {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .success-criteria ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .success-criteria li {
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .success-criteria li::before {
+            content: '🏆';
+            margin-right: 10px;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .scope-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .milestone {
+                flex-direction: column !important;
+                align-items: flex-start;
+                padding-left: 50px;
+            }
+
+            .milestone-content {
+                width: 100%;
+            }
+
+            .milestone-dot {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Problem Statement</h1>
+            <p class="subtitle">Personal Expense Management System</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('overview')">Overview</div>
+            <div class="nav-tab" onclick="showSection('problem')">Problem Statement</div>
+            <div class="nav-tab" onclick="showSection('objectives')">Objectives</div>
+            <div class="nav-tab" onclick="showSection('requirements')">Requirements</div>
+            <div class="nav-tab" onclick="showSection('scope')">Scope</div>
+            <div class="nav-tab" onclick="showSection('milestones')">Milestones</div>
+            <div class="nav-tab" onclick="showSection('constraints')">Constraints</div>
+            <div class="nav-tab" onclick="showSection('success')">Success Criteria</div>
+        </div>
+
+        <div class="content">
+            <!-- Overview Section -->
+            <div class="section active" id="overview">
+                <h2 class="section-title">📊 Project Overview</h2>
+                
+                <div class="card">
+                    <h3>Executive Summary</h3>
+                    <p>The Personal Expense Management System is a comprehensive full-stack application designed to address the growing need for efficient personal finance tracking and analysis. In an era where financial literacy and budget management are crucial, this system provides individuals with powerful tools to monitor, analyze, and optimize their spending habits.</p>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Real-time Tracking</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">5+</div>
+                        <div class="stat-label">Analytics Views</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Expense Records</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Access</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Project Context</h3>
+                    <p><strong>Domain:</strong> Personal Finance Management & Financial Technology (FinTech)</p>
+                    <p><strong>Target Users:</strong> Individuals seeking better control over their personal finances</p>
+                    <p><strong>Technology Stack:</strong> Python, FastAPI, Streamlit, MySQL</p>
+                    <p><strong>Project Type:</strong> Full-stack Web Application</p>
+                </div>
+            </div>
+
+            <!-- Problem Statement Section -->
+            <div class="section" id="problem">
+                <h2 class="section-title">⚠️ Problem Statement</h2>
+                
+                <div class="card">
+                    <h3>The Challenge</h3>
+                    <p>In today's fast-paced world, individuals struggle to maintain clear visibility over their financial health. The lack of structured expense tracking leads to overspending, difficulty in budget planning, and ultimately, financial stress.</p>
+                </div>
+
+                <h3 style="margin: 30px 0 20px 0; color: #e74c3c;">Key Problems Identified:</h3>
+                <ul class="problem-points">
+                    <li><strong>Lack of Financial Visibility:</strong> People don't have a clear picture of where their money is going on a daily, weekly, or monthly basis.</li>
+                    <li><strong>Manual Tracking Inefficiency:</strong> Traditional methods like spreadsheets or notebooks are time-consuming and error-prone.</li>
+                    <li><strong>No Analytical Insights:</strong> Existing solutions don't provide meaningful analysis of spending patterns by category or time period.</li>
+                    <li><strong>Data Fragmentation:</strong> Expenses are scattered across multiple receipts, bank statements, and mental notes.</li>
+                    <li><strong>Budget Planning Difficulty:</strong> Without historical data analysis, creating realistic budgets becomes guesswork.</li>
+                    <li><strong>Time Delay in Recording:</strong> People forget to record expenses immediately, leading to data loss.</li>
+                    <li><strong>Complex User Interfaces:</strong> Many existing tools are overly complex or require steep learning curves.</li>
+                </ul>
+
+                <div class="card">
+                    <h3>Impact of the Problem</h3>
+                    <p>💸 <strong>Financial Impact:</strong> Average individuals lose track of 15-20% of their monthly spending</p>
+                    <p>⏰ <strong>Time Impact:</strong> 2-3 hours per month wasted on manual expense reconciliation</p>
+                    <p>🧠 <strong>Mental Impact:</strong> Increased financial stress and anxiety due to uncertainty</p>
+                    <p>📊 <strong>Planning Impact:</strong> Inability to make data-driven financial decisions</p>
+                </div>
+            </div>
+
+            <!-- Objectives Section -->
+            <div class="section" id="objectives">
+                <h2 class="section-title">🎯 Project Objectives</h2>
+                
+                <div class="card">
+                    <h3>Primary Objective</h3>
+                    <p>To develop a user-friendly, efficient, and comprehensive expense tracking system that empowers individuals to gain complete control over their personal finances through real-time tracking, detailed analytics, and actionable insights.</p>
+                </div>
+
+                <h3 style="margin: 30px 0 20px 0; color: #27ae60;">Specific Objectives:</h3>
+                <ul class="objective-list">
+                    <li><strong>Simplify Expense Recording:</strong> Create an intuitive interface for quick and easy expense entry with minimal user effort.</li>
+                    <li><strong>Enable Date-Based Organization:</strong> Allow users to track and retrieve expenses for any specific date efficiently.</li>
+                    <li><strong>Provide Category-Wise Analysis:</strong> Generate detailed breakdowns of spending across different categories (Rent, Food, Shopping, etc.).</li>
+                    <li><strong>Visualize Spending Trends:</strong> Present data through interactive charts and graphs for better comprehension.</li>
+                    <li><strong>Support Time-Period Analysis:</strong> Enable users to analyze expenses over custom date ranges (weekly, monthly, yearly).</li>
+                    <li><strong>Ensure Data Persistence:</strong> Maintain a reliable database system for secure long-term data storage.</li>
+                    <li><strong>Build Scalable Architecture:</strong> Design a system that can handle growing data volumes and future feature additions.</li>
+                    <li><strong>Implement RESTful API:</strong> Create a well-documented API for potential integration with other applications.</li>
+                    <li><strong>Maintain Code Quality:</strong> Ensure high code quality through comprehensive testing and documentation.</li>
+                    <li><strong>Optimize Performance:</strong> Deliver fast response times and smooth user experience across all features.</li>
+                </ul>
+            </div>
+
+            <!-- Requirements Section -->
+            <div class="section" id="requirements">
+                <h2 class="section-title">📋 Requirements</h2>
+                
+                <div class="requirements-grid">
+                    <div class="requirement-card">
+                        <h4>🔧 Functional Requirements</h4>
+                        <ul>
+                            <li>Add/Update expenses for specific dates</li>
+                            <li>Categorize expenses (Rent, Food, etc.)</li>
+                            <li>Add notes/descriptions to expenses</li>
+                            <li>View expenses by date</li>
+                            <li>Generate category-wise summaries</li>
+                            <li>Display monthly expense breakdowns</li>
+                            <li>Filter expenses by date range</li>
+                            <li>Calculate totals and percentages</li>
+                            <li>Visualize data with charts</li>
+                            <li>Support bulk expense entry</li>
+                        </ul>
+                    </div>
+
+                    <div class="requirement-card">
+                        <h4>⚙️ Non-Functional Requirements</h4>
+                        <ul>
+                            <li>Response time < 2 seconds</li>
+                            <li>99.9% system availability</li>
+                            <li>Support 1000+ concurrent users</li>
+                            <li>Secure database connections</li>
+                            <li>Mobile-responsive interface</li>
+                            <li>Cross-browser compatibility</li>
+                            <li>Intuitive user experience</li>
+                            <li>Comprehensive error handling</li>
+                            <li>Detailed logging system</li>
+                            <li>Clean, maintainable code</li>
+                        </ul>
+                    </div>
+
+                    <div class="requirement-card">
+                        <h4>💻 Technical Requirements</h4>
+                        <ul>
+                            <li>Python 3.8+ environment</li>
+                            <li>MySQL 8.0+ database</li>
+                            <li>FastAPI framework for backend</li>
+                            <li>Streamlit for frontend</li>
+                            <li>RESTful API architecture</li>
+                            <li>Pydantic data validation</li>
+                            <li>Context manager for DB</li>
+                            <li>Pandas for data processing</li>
+                            <li>Pytest for testing</li>
+                            <li>Git version control</li>
+                        </ul>
+                    </div>
+
+                    <div class="requirement-card">
+                        <h4>📊 Data Requirements</h4>
+                        <ul>
+                            <li>Store expense date</li>
+                            <li>Store expense amount (decimal)</li>
+                            <li>Store expense category</li>
+                            <li>Store expense notes/description</li>
+                            <li>Maintain creation timestamps</li>
+                            <li>Support data indexing</li>
+                            <li>Enable data aggregation</li>
+                            <li>Ensure data integrity</li>
+                            <li>Support data backup</li>
+                            <li>Handle concurrent updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scope Section -->
+            <div class="section" id="scope">
+                <h2 class="section-title">🎨 Project Scope</h2>
+                
+                <div class="scope-grid">
+                    <div class="scope-card in-scope">
+                        <h3>✅ In Scope</h3>
+                        <ul>
+                            <li>Expense recording and updating</li>
+                            <li>Category-based classification</li>
+                            <li>Date-wise expense retrieval</li>
+                            <li>Analytics by category</li>
+                            <li>Monthly expense summaries</li>
+                            <li>Interactive visualizations</li>
+                            <li>Custom date range analysis</li>
+                            <li>RESTful API development</li>
+                            <li>Database design & implementation</li>
+                            <li>Frontend UI development</li>
+                            <li>Unit testing</li>
+                            <li>Documentation</li>
+                            <li>Logging system</li>
+                            <li>Error handling</li>
+                            <li>Data persistence</li>
+                        </ul>
+                    </div>
+
+                    <div class="scope-card out-scope">
+                        <h3>❌ Out of Scope</h3>
+                        <ul>
+                            <li>User authentication/multi-user</li>
+                            <li>Mobile application</li>
+                            <li>Bank account integration</li>
+                            <li>Automatic expense import</li>
+                            <li>Budget alerts/notifications</li>
+                            <li>Recurring expense automation</li>
+                            <li>Receipt image processing</li>
+                            <li>Currency conversion</li>
+                            <li>Data export to Excel</li>
+                            <li>Cloud deployment</li>
+                            <li>Machine learning predictions</li>
+                            <li>Social sharing features</li>
+                            <li>Payment gateway integration</li>
+                            <li>Investment tracking</li>
+                            <li>Tax calculation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Milestones Section -->
+            <div class="section" id="milestones">
+                <h2 class="section-title">🏁 Project Milestones</h2>
+                
+                <div class="timeline">
+                    <div class="milestone">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-content">
+                            <span class="milestone-number">Phase 1</span>
+                            <h3>🔍 Requirement Analysis & Planning</h3>
+                            <p><strong>Duration:</strong> Week 1</p>
+                            <p><strong>Deliverables:</strong></p>
+                            <ul>
+                                <li>Problem statement document</li>
+                                <li>Requirements specification</li>
+                                <li>System architecture design</li>
+                                <li>Technology stack finalization</li>
+                                <li>Database schema design</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="milestone">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-content">
+                            <span class="milestone-number">Phase 2</span>
+                            <h3>🗄️ Database Setup & Backend Development</h3>
+                            <p><strong>Duration:</strong> Week 2-3</p>
+                            <p><strong>Deliverables:</strong></p>
+                            <ul>
+                                <li>MySQL database setup</li>
+                                <li>Database helper functions</li>
+                                <li>Context manager implementation</li>
+                                <li>Logging system setup</li>
+                                <li>Basic CRUD operations</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="milestone">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-content">
+                            <span class="milestone-number">Phase 3</span>
+                            <h3>🔌 API Development</h3>
+                            <p><strong>Duration:</strong> Week 3-4</p>
+                            <p><strong>Deliverables:</strong></p>
+                            <ul>
+                                <li>FastAPI application setup</li>
+                                <li>RESTful endpoints creation</li>
+                                <li>Pydantic models for validation</li>
+                                <li>Error handling implementation</li>
+                                <li>API documentation (Swagger)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="milestone">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-content">
+                            <span class="milestone-number">Phase 4</span>
+                            <h3>🎨 Frontend Development</h3>
+                            <p><strong>Duration:</strong> Week 4-5</p>
+                            <p><strong>Deliverables:</strong></p>
+                            <ul>
+                                <li>Streamlit application setup</li>
+                                <li>Add/Update expense interface</li>
+                                <li>Category analytics view</li>
+                                <li>Monthly analytics view</li>
+                                <li>Interactive visualizations</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="milestone">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-content">
+                            <span class="milestone-number">Phase 5</span>
+                            <h3>🧪 Testing & Quality Assurance</h3>
+                            <p><strong>Duration:</strong> Week 5-6</p>
+                            <p><strong>Deliverables:</strong></p>
+                            <ul>
+                                <li>Unit test development</li>
+                                <li>Integration testing</li>
+                                <li>Bug fixes and optimization</li>
+                                <li>Code review and refactoring</li>
+                                <li>Performance testing</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="milestone">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-content">
+                            <span class="milestone-number">Phase 6</span>
+                            <h3>📚 Documentation & Deployment</h3>
+                            <p><strong>Duration:</strong> Week 6</p>
+                            <p><strong>Deliverables:</strong></p>
+                            <ul>
+                                <li>README.md creation</li>
+                                <li>API documentation</li>
+                                <li>User guide</li>
+                                <li>Code comments and docstrings</li>
+                                <li>Local deployment setup</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Constraints Section -->
+            <div class="section" id="constraints">
+                <h2 class="section-title">⚖️ Constraints & Limitations</h2>
+                
+                <div class="constraints-container">
+                    <div class="constraint-box">
+                        <div class="constraint-icon">⏱️</div>
+                        <h3>Time Constraints</h3>
+                        <p><strong>Project Duration:</strong> 6 weeks</p>
+                        <p>Limited time for implementing advanced features like ML predictions or cloud deployment.</p>
+                    </div>
+
+                    <div class="constraint-box">
+                        <div class="constraint-icon">💰</div>
+                        <h3>Budget Constraints</h3>
+                        <p><strong>Budget:</strong> Zero-cost development</p>
+                        <p>Using only free and open-source technologies. No paid hosting or third-party services.</p>
+                    </div>
+
+                    <div class="constraint-box">
+                        <div class="constraint-icon">👥</div>
+                        <h3>Resource Constraints</h3>
+                        <p><strong>Team Size:</strong> Individual developer</p>
+                        <p>Limited to single developer capabilities and time availability.</p>
+                    </div>
+
+                    <div class="constraint-box">
+                        <div class="constraint-icon">🔧</div>
+                        <h3>Technical Constraints</h3>
+                        <p><strong>Technology Stack:</strong> Python ecosystem</p>
+                        <p>Limited to Python-based frameworks and MySQL database.</p>
+                    </div>
+
+                    <div class="constraint-box">
+                        <div class="constraint-icon">🌐</div>
+                        <h3>Deployment Constraints</h3>
+                        <p><strong>Hosting:</strong> Local deployment only</p>
+                        <p>System designed for localhost operation without cloud infrastructure.</p>
+                    </div>
+
+                    <div class="constraint-box">
+                        <div class="constraint-icon">👤</div>
+                        <h3>User Constraints</h3>
+                        <p><strong>User Base:</strong> Single user system</p>
+                        <p>No multi-user authentication or role-based access control.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 30px;">
+                    <h3>Assumptions</h3>
+                    <ul style="list-style: disc; margin-left: 20px;">
+                        <li>Users have basic computer literacy and understand personal finance concepts</li>
+                        <li>Users have access to a computer with Python and MySQL installed</li>
+                        <li>Users will manually enter expenses (no automatic import)</li>
+                        <li>Data accuracy depends on user input quality</li>
+                        <li>System runs on localhost environment</li>
+                        <li>Users are comfortable with command-line setup process</li>
+                        <li>Internet connection available for initial setup and dependencies</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Dependencies</h3>
+                    <ul style="list-style: disc; margin-left: 20px;">
+                        <li><strong>Python 3.8+:</strong> Core programming language</li>
+                        <li><strong>MySQL 8.0+:</strong> Database management system</li>
+                        <li><strong>FastAPI:</strong> Backend API framework</li>
+                        <li><strong>Uvicorn:</strong> ASGI server for FastAPI</li>
+                        <li><strong>Streamlit:</strong> Frontend framework</li>
+                        <li><strong>Pandas:</strong> Data manipulation library</li>
+                        <li><strong>Requests:</strong> HTTP client library</li>
+                        <li><strong>Pytest:</strong> Testing framework</li>
+                        <li><strong>mysql-connector-python:</strong> MySQL driver</li>
+                        <li><strong>Pydantic:</strong> Data validation library</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Success Criteria Section -->
+            <div class="section" id="success">
+                <h2 class="section-title">🏆 Success Criteria</h2>
+                
+                <div class="success-criteria">
+                    <h3 style="margin-bottom: 20px;">The project will be considered successful when:</h3>
+                    <ul>
+                        <li>Users can add/update expenses for any date with 100% data accuracy</li>
+                        <li>All expenses are retrieved correctly without data loss</li>
+                        <li>Category-wise analytics display accurate percentages and totals</li>
+                        <li>Monthly summaries show correct aggregated data</li>
+                        <li>Charts and visualizations render correctly across browsers</li>
+                        <li>API responds within 2 seconds for all endpoints</li>
+                        <li>System handles edge cases (invalid dates, empty data) gracefully</li>
+                        <li>All unit tests pass with 80%+ code coverage</li>
+                        <li>Zero critical bugs in production</li>
+                        <li>Database connections are properly managed without memory leaks</li>
+                        <li>Comprehensive documentation is available</li>
+                        <li>System can be set up by following README instructions</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-top: 30px;">
+                    <h3>Key Performance Indicators (KPIs)</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div style="padding: 15px; background: #e3f2fd; border-radius: 10px;">
+                            <h4 style="color: #1976d2;">📊 Data Accuracy</h4>
+                            <p><strong>Target:</strong> 100%</p>
+                            <p>All calculations and data retrieval must be error-free</p>
+                        </div>
+                        <div style="padding: 15px; background: #f3e5f5; border-radius: 10px;">
+                            <h4 style="color: #7b1fa2;">⚡ Performance</h4>
+                            <p><strong>Target:</strong> < 2s response time</p>
+                            <p>All API endpoints respond within 2 seconds</p>
+                        </div>
+                        <div style="padding: 15px; background: #e8f5e9; border-radius: 10px;">
+                            <h4 style="color: #388e3c;">✅ Test Coverage</h4>
+                            <p><strong>Target:</strong> 80%+</p>
+                            <p>At least 80% of code covered by automated tests</p>
+                        </div>
+                        <div style="padding: 15px; background: #fff3e0; border-radius: 10px;">
+                            <h4 style="color: #f57c00;">🎯 User Experience</h4>
+                            <p><strong>Target:</strong> Intuitive & Fast</p>
+                            <p>Users can complete tasks in < 5 clicks</p>
+                        </div>
+                        <div style="padding: 15px; background: #fce4ec; border-radius: 10px;">
+                            <h4 style="color: #c2185b;">🐛 Bug Count</h4>
+                            <p><strong>Target:</strong> Zero critical bugs</p>
+                            <p>No system-breaking bugs in release</p>
+                        </div>
+                        <div style="padding: 15px; background: #e0f2f1; border-radius: 10px;">
+                            <h4 style="color: #00796b;">📚 Documentation</h4>
+                            <p><strong>Target:</strong> Complete coverage</p>
+                            <p>All features and APIs documented</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Acceptance Criteria</h3>
+                    <div style="display: grid; gap: 15px; margin-top: 15px;">
+                        <div style="padding: 15px; background: white; border-left: 4px solid #4caf50; border-radius: 5px;">
+                            <h4>✓ Functional Acceptance</h4>
+                            <ul style="margin-top: 10px; list-style: disc; margin-left: 20px;">
+                                <li>All CRUD operations work correctly</li>
+                                <li>Analytics calculations are accurate</li>
+                                <li>Data persists across sessions</li>
+                                <li>UI is responsive and intuitive</li>
+                            </ul>
+                        </div>
+                        <div style="padding: 15px; background: white; border-left: 4px solid #2196f3; border-radius: 5px;">
+                            <h4>✓ Technical Acceptance</h4>
+                            <ul style="margin-top: 10px; list-style: disc; margin-left: 20px;">
+                                <li>Code follows Python best practices (PEP 8)</li>
+                                <li>All tests pass successfully</li>
+                                <li>No memory leaks or resource issues</li>
+                                <li>Error handling covers edge cases</li>
+                            </ul>
+                        </div>
+                        <div style="padding: 15px; background: white; border-left: 4px solid #ff9800; border-radius: 5px;">
+                            <h4>✓ Documentation Acceptance</h4>
+                            <ul style="margin-top: 10px; list-style: disc; margin-left: 20px;">
+                                <li>README with installation instructions</li>
+                                <li>API documentation available</li>
+                                <li>Code is well-commented</li>
+                                <li>User guide provided</li>
+                            </ul>
+                        </div>
+                        <div style="padding: 15px; background: white; border-left: 4px solid #9c27b0; border-radius: 5px;">
+                            <h4>✓ Quality Acceptance</h4>
+                            <ul style="margin-top: 10px; list-style: disc; margin-left: 20px;">
+                                <li>No critical or high-priority bugs</li>
+                                <li>Performance meets requirements</li>
+                                <li>Code is maintainable and scalable</li>
+                                <li>Security best practices followed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Future Enhancements (Post-MVP)</h3>
+                    <p style="margin-bottom: 15px;">Features planned for future versions:</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                        <div style="padding: 15px; background: #f5f5f5; border-radius: 10px;">
+                            <h4 style="color: #667eea;">🔐 Version 2.0</h4>
+                            <ul style="list-style: disc; margin-left: 20px; margin-top: 10px;">
+                                <li>User authentication</li>
+                                <li>Multi-user support</li>
+                                <li>Role-based access control</li>
+                            </ul>
+                        </div>
+                        <div style="padding: 15px; background: #f5f5f5; border-radius: 10px;">
+                            <h4 style="color: #667eea;">📱 Version 2.5</h4>
+                            <ul style="list-style: disc; margin-left: 20px; margin-top: 10px;">
+                                <li>Mobile application</li>
+                                <li>Push notifications</li>
+                                <li>Offline mode</li>
+                            </ul>
+                        </div>
+                        <div style="padding: 15px; background: #f5f5f5; border-radius: 10px;">
+                            <h4 style="color: #667eea;">🤖 Version 3.0</h4>
+                            <ul style="list-style: disc; margin-left: 20px; margin-top: 10px;">
+                                <li>ML-based predictions</li>
+                                <li>Smart budget suggestions</li>
+                                <li>Anomaly detection</li>
+                            </ul>
+                        </div>
+                        <div style="padding: 15px; background: #f5f5f5; border-radius: 10px;">
+                            <h4 style="color: #667eea;">🌐 Version 3.5</h4>
+                            <ul style="list-style: disc; margin-left: 20px; margin-top: 10px;">
+                                <li>Cloud deployment</li>
+                                <li>Bank integration</li>
+                                <li>Receipt OCR</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3 style="margin-bottom: 10px;">📌 Document Information</h3>
+            <p><strong>Document Version:</strong> 1.0</p>
+            <p><strong>Last Updated:</strong> November 2024</p>
+            <p><strong>Project Status:</strong> In Development</p>
+            <p style="margin-top: 20px;">© 2024 Personal Expense Management System</p>
+            <p style="margin-top: 10px; opacity: 0.8;">This document outlines the comprehensive problem statement and project plan for the development of a personal expense tracking system.</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+
+            // Smooth scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Add hover effect to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card, .requirement-card, .constraint-box');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.3s ease';
+                });
+            });
+
+            // Add animation to stats on scroll
+            const observerOptions = {
+                threshold: 0.5,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'fadeIn 0.6s ease forwards';
+                    }
+                });
+            }, observerOptions);
+
+            const statBoxes = document.querySelectorAll('.stat-box');
+            statBoxes.forEach(box => observer.observe(box));
+        });
+
+        // Add print functionality
+        function printDocument() {
+            window.print();
+        }
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const tabs = ['overview', 'problem', 'objectives', 'requirements', 'scope', 'milestones', 'constraints', 'success'];
+            const activeTab = document.querySelector('.section.active');
+            const currentIndex = tabs.indexOf(activeTab.id);
+
+            if (e.key === 'ArrowRight' && currentIndex < tabs.length - 1) {
+                document.querySelectorAll('.nav-tab')[currentIndex + 1].click();
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                document.querySelectorAll('.nav-tab')[currentIndex - 1].click();
+            }
+        });
+    </script>
+</body>
+</html>
