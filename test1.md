@@ -25,49 +25,68 @@ This document describes the **current demo / PoC architecture** of the Chatbot B
 ### 2.1 Component View
 
 ```mermaid
-graph TD
+graph TB
+    %% Styles
+    classDef comp fill:#eef7ff,stroke:#5b8ff6,stroke-width:1px,color:#000
+    classDef group fill:#fff7e6,stroke:#ffa940,stroke-width:1px,color:#000
 
-subgraph Client_Side["Client Side"]
-  WIDGET["JS Chat Widget<br/>(Embedded on client site)"]
-  PY_ADMIN["Python-based Admin UI<br/>(Jinja/HTMX/Streamlit)"]
-  REACT_ADMIN["React Admin Dashboard<br/>(Optional)"]
-end
+    %% =============================
+    %% CLIENT SIDE (COMPONENTS)
+    %% =============================
+    subgraph CLIENT["Client Side"]
+        WIDGET["JS Chat Widget\n(Embedded on client site)"]:::comp
+        PY_UI["Python-based Admin UI\n(Jinja/HTMX/Streamlit)"]:::comp
+        REACT_UI["React Admin Dashboard\n(Optional)"]:::comp
+    end
 
-subgraph Backend["Backend Layer (80% FastAPI, 20% Django)"]
-  APIGW["FastAPI API Layer<br/>/api/v1/*, Webhooks, WS"]
-  DJANGO["Django App<br/>Admin, selected views"]
-  ORCH["Orchestration Engine<br/>LangChain + LangGraph"]
-  SRV_CHAT["Chatbot Service<br/>Session, routing"]
-  SRV_CFG["Chatbot Config Service<br/>CRUD Chatbots & Providers"]
-  SRV_ANALYTICS["Analytics Service"]
-end
+    %% =============================
+    %% BACKEND LAYER (COMPONENTS)
+    %% =============================
+    subgraph BACKEND["Backend Layer (80% FastAPI / 20% Django)"]
+        FASTAPI["FastAPI API Layer\n(/api/v1/*, Webhooks, WS)"]:::comp
+        DJANGO["Django App\n(Admin, selected views)"]:::comp
+        CHAT_SVC["Chatbot Service\n(Session, routing)"]:::comp
+        CFG_SVC["Chatbot Config Service\n(CRUD Chatbots & Providers)"]:::comp
+        ANALYTICS_SVC["Analytics Service"]:::comp
+        ORCH["Orchestration Engine\n(LangChain + LangGraph)"]:::comp
+    end
 
-subgraph AI_Providers["AI & Voice Providers"]
-  GEMINI["Gemini LLM & Embeddings"]
-  SARVAM["Sarvam STT/TTS/Translation"]
-end
+    %% =============================
+    %% AI & VOICE PROVIDERS
+    %% =============================
+    subgraph AI["AI & Voice Providers"]
+        GEMINI["Gemini\nLLM & Embeddings"]:::comp
+        SARVAM["Sarvam\nSTT / TTS / Translation"]:::comp
+    end
 
-subgraph Data_Layer["Data & Storage Layer"]
-  SUPABASE["Supabase (Self-hosted)<br/>Postgres + pgvector"]
-  D_APP["App DB Schemas<br/>Users, Chatbots, Conversations"]
-  D_VEC["Vector Store Collections<br/>Embeddings per chatbot"]
-  D_LOGS["Logs & Analytics Store"]
-end
+    %% =============================
+    %% DATA & STORAGE LAYER
+    %% =============================
+    subgraph DATA["Data & Storage Layer"]
+        SUPABASE["Supabase (Self-hosted)\nPostgres + pgvector"]:::comp
+        LOGS["Logs & Analytics Store"]:::comp
+    end
 
-WIDGET -->|"Webhook + WS"| APIGW
-PY_ADMIN -->|"REST / Django Views"| APIGW
-REACT_ADMIN -->|"REST / GraphQL"| APIGW
+    %% =============================
+    %% RELATIONSHIPS (STRUCTURAL)
+    %% =============================
 
-APIGW --> DJANGO
-APIGW --> SRV_CHAT
-APIGW --> SRV_CFG
-APIGW --> SRV_ANALYTICS
+    %% Client → Backend contracts
+    WIDGET ---|"Webhook + WebSocket"| FASTAPI
+    PY_UI ---|"REST / Django Views"| FASTAPI
+    REACT_UI ---|"REST / API / GraphQL"| FASTAPI
 
-SRV_CHAT --> ORCH
-ORCH --> GEMINI
-ORCH --> SARVAM
-ORCH --> SUPABASE
+    %% Backend internal components
+    FASTAPI --- DJANGO
+    FASTAPI --- CHAT_SVC
+    FASTAPI --- CFG_SVC
+    FASTAPI --- ANALYTICS_SVC
 
-SUPABASE --> D_APP
-SUPABASE --> D_VEC
-SRV_ANALYTICS --> D_LOGS
+    CHAT_SVC --- ORCH
+    CFG_SVC --- SUPABASE
+    ANALYTICS_SVC --- LOGS
+
+    %% Orchestration dependencies
+    ORCH --- GEMINI
+    ORCH --- SARVAM
+    ORCH --- SUPABASE
