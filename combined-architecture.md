@@ -20,6 +20,7 @@ This document describes the **current demo / PoC architecture** of the Chatbot B
 
 ---
 
+
 ## 2. High-Level Architecture Blueprint
 
 ### 2.1 Component View
@@ -263,7 +264,7 @@ DB_APP -->|"6.3 Config Data, Chatbot List"| P6
 P6 -->|"6.4 Config Data / Dashboard to Admin"| ADM
 ```
 
-## 2. Project Structure
+## 3. Project Folder Structure
 
 ```text
 chatbot-platform/
