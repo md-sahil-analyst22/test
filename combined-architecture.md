@@ -1,4 +1,4 @@
-# Chatbot Builder Platform – Architecture Blueprint & Data Flow (Draft v1)
+# Chatbot Builder Platform 
 
 ## 1. System Overview
 
@@ -92,7 +92,7 @@ graph TB
     ORCH --- SUPABASE
 ```
 
-### 3.1 Overall Flow Chart – Text & Voice Request
+### 2.2 Overall Flow Chart – Text & Voice Request
 
 ```mermaid
 flowchart TD
@@ -146,9 +146,11 @@ flowchart TD
     V_TTS_DEC -->|Yes| V_TTS["Call Sarvam TTS (text → audio)"]:::step
     V_TTS --> V_STREAM["Stream audio back via WebSocket"]:::step
     V_STREAM --> V_PLAY["Widget plays audio reply"]:::step
+```
 
+### 2.3 DFD 
 
-### 4.1 DFD Level-0
+#### 2.3.1 DFD Level-0
 
 ```mermaid
 flowchart TD
@@ -191,9 +193,9 @@ DB_VEC --> P0
 
 P0 --> DB_LOG
 DB_LOG --> P0
+```
 
-
-### 4.2 DFD Level-1
+#### 2.3.2 DFD Level-1
 
 ```mermaid
 flowchart TD
@@ -259,7 +261,7 @@ ADM -->|"6.1 Admin Actions<br/>Create/Update Chatbots, Providers"| P6
 P6 -->|"6.2 Persist Config"| DB_APP
 DB_APP -->|"6.3 Config Data, Chatbot List"| P6
 P6 -->|"6.4 Config Data / Dashboard to Admin"| ADM
-
+```
 
 # Chatbot Platform – Project Structure
 
