@@ -264,6 +264,9 @@ DB_APP -->|"6.3 Config Data, Chatbot List"| P6
 P6 -->|"6.4 Config Data / Dashboard to Admin"| ADM
 ```
 
+
+---
+
 ## 3. Project Folder Structure
 
 ```text
