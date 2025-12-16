@@ -1,15 +1,16 @@
 ``` mermaid
 flowchart TD
-  A[User Message Arrives] --> B[Resolve owner key<br/>owner_type: user or session<br/>owner_id: user_id or session_id<br/>thread_id]
-  B --> C[Fetch last N messages for owner+thread<br/>(ordered newest->oldest)]
-  C --> D[Build prompt: system + window + current]
-  D --> E[LLM generate response]
-  E --> F[Persist user msg + assistant msg]
-  F --> G[Enforce window limit N]
-  G --> H{Count > N?}
+  A[User message arrives] --> B[Resolve owner key]
+  B --> C[Load last N messages]
+  C --> D[Build prompt]
+  D --> E[LLM generates response]
+  E --> F[Store user and assistant messages]
+  F --> G[Enforce limit N]
+  G --> H{More than N?}
   H -- No --> Z[Return response]
-  H -- Yes --> I[Delete oldest messages beyond N<br/>for owner+thread]
+  H -- Yes --> I[Delete oldest messages]
   I --> Z
+
 
 ```
 
