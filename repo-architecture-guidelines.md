@@ -278,17 +278,21 @@ sequenceDiagram
 ### 6.2 Voice Chat Flow (Streaming)
 ```mermaid
 flowchart TD
-  A[WS audio chunk] --> B[STT provider]
-  B --> C{turn_ready?}
+  A[WS audio chunk received] --> B[STT transcribe chunk]
+  B --> C{End of utterance?}
   C -- No --> A
-  C -- Yes --> D[Load memory window]
-  D --> E[Optional retrieval (RAG)]
-  E --> F[LLM generate]
-  F --> G{TTS enabled?}
-  G -- Yes --> H[TTS provider stream]
-  H --> I[WS audio out]
-  G -- No --> J[WS text out]
-  F --> K[Persist + trim last N]
+  C -- Yes --> D[Fetch last N messages]
+  D --> E{RAG enabled?}
+  E -- Yes --> R[Retrieve top K docs]
+  E -- No --> F[Skip retrieval]
+  R --> L[LLM generate response]
+  F --> L[LLM generate response]
+  L --> T{TTS enabled?}
+  T -- Yes --> S[Synthesize speech stream]
+  S --> O[Stream audio to client]
+  T -- No --> X[Send text to client]
+  L --> P[Persist user and assistant turns]
+  P --> Q[Trim memory to last N]
 ```
 
 ---
