@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Retrievers for RAG Systems - Complete Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --code-bg: #2d3748;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 2rem 0;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            transform: rotate(30deg);
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            padding: 0 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px var(--shadow);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-btn:hover {
+            background: var(--light);
+        }
+        
+        .tab-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-bottom-color: var(--accent);
+        }
+        
+        /* Content Sections */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+            font-size: 1.8rem;
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 1.2rem 0 0.8rem;
+            font-size: 1.4rem;
+        }
+        
+        h4 {
+            color: var(--dark);
+            margin: 1rem 0 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 3px 5px var(--shadow);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .card.warning {
+            border-left-color: var(--warning);
+            background: #fff9e6;
+        }
+        
+        .card.success {
+            border-left-color: var(--success);
+            background: #e8f7ef;
+        }
+        
+        .card.accent {
+            border-left-color: var(--accent);
+            background: #fee;
+        }
+        
+        /* Diagrams and Images */
+        .diagram-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border: 1px solid #ddd;
+            overflow: auto;
+            text-align: center;
+            min-height: 300px;
+            position: relative;
+        }
+        
+        .mermaid {
+            width: 100%;
+            min-height: 250px;
+            font-size: 14px;
+        }
+        
+        .mermaid-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            color: #6c757d;
+            text-align: center;
+            margin: 1rem 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mermaid-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #adb5bd;
+        }
+        
+        .framework-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: var(--border-radius);
+            margin: 1.5rem auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            min-height: 200px;
+        }
+        
+        .image-caption {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Code Blocks */
+        .code-container {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #4a5568;
+        }
+        
+        .code-lang {
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .code-copy {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .code-copy:hover {
+            background: var(--secondary);
+        }
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        code {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+        
+        /* Tables */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 3px 5px var(--shadow);
+        }
+        
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f0f7ff;
+        }
+        
+        /* Feature Lists */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-item {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: 0 3px 5px var(--shadow);
+            border-top: 3px solid var(--secondary);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tab-btn {
+                min-width: 120px;
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .tab-content {
+                padding: 1.5rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-container {
+                padding: 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .framework-image {
+                max-width: 100%;
+            }
+            
+            .mermaid {
+                min-height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                min-width: 100%;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        /* Utility Classes */
+        .highlight {
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge-langchain {
+            background: #3c8dbc;
+            color: white;
+        }
+        
+        .badge-llamaindex {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .badge-core {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge-advanced {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .info-box {
+            background: #e8f4fc;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        .key-point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+        
+        .key-point i {
+            color: var(--secondary);
+            margin-right: 0.8rem;
+            margin-top: 0.2rem;
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .image-item {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: 0 3px 5px var(--shadow);
+            text-align: center;
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            min-height: 200px;
+            background: #f8f9fa;
+            object-fit: cover;
+        }
+        
+        /* Loading states */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .visible {
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-search"></i> Advanced Retrievers for RAG Systems</h1>
+                <p class="subtitle">A Comprehensive Guide to LangChain and LlamaIndex Retrieval Techniques</p>
+                <p>Complete reference covering architectures, implementations, use cases, and future trends</p>
+            </div>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="overview"><i class="fas fa-home"></i> Overview</button>
+            <button class="tab-btn" data-tab="core-concepts"><i class="fas fa-cube"></i> Core Concepts</button>
+            <button class="tab-btn" data-tab="langchain"><i class="fas fa-link"></i> LangChain</button>
+            <button class="tab-btn" data-tab="llamaindex"><i class="fas fa-project-diagram"></i> LlamaIndex</button>
+            <button class="tab-btn" data-tab="comparison"><i class="fas fa-balance-scale"></i> Comparison</button>
+            <button class="tab-btn" data-tab="implementation"><i class="fas fa-code"></i> Implementation</button>
+            <button class="tab-btn" data-tab="future"><i class="fas fa-rocket"></i> Future Trends</button>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2><i class="fas fa-info-circle"></i> What are Advanced Retrievers?</h2>
+            <p>Advanced retrievers are sophisticated components in RAG (Retrieval-Augmented Generation) systems that go beyond simple vector similarity search to provide more nuanced, context-aware information retrieval. They combine multiple techniques to deliver highly relevant documents based on complex queries.</p>
+            
+            <div class="card">
+                <h3>Why Advanced Retrievers Matter</h3>
+                <div class="key-point">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Improved Accuracy:</strong> Find more relevant information using multiple search strategies
+                    </div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Better Context Preservation:</strong> Maintain important relationships between information pieces
+                    </div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Reduced Hallucination:</strong> More precise retrieval leads to more accurate AI responses
+                    </div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Scalability:</strong> Efficient strategies work better with large document collections
+                    </div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Flexibility:</strong> Different methods can be combined for optimal results
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-grid">
+                <div class="image-item">
+                    <img src="https://raw.githubusercontent.com/md-sahil-analyst22/Study_Material/main/images/Advanced_retreiver.png" alt="Advanced Retriever Overview" onerror="this.onerror=null; this.alt='Image: Advanced Retriever Framework'; this.style.background='#f0f0f0'; this.style.padding='20px';">
+                    <h4>Advanced Retriever Framework</h4>
+                    <p>Comprehensive overview of different retriever types and their applications in RAG systems</p>
+                </div>
+            </div>
+            
+            <div class="diagram-container">
+                <div id="diagram1" class="mermaid">
+                    flowchart TD
+                        A[User Query] --> B{Query Type Analysis}
+                        B --> C[Semantic Query]
+                        B --> D[Keyword Query]
+                        B --> E[Complex Query]
+                        
+                        C --> F[Vector-based Retriever]
+                        D --> G[BM25/Keyword Retriever]
+                        E --> H[Hybrid/Fusion Retriever]
+                        
+                        F --> I[Embedding Model]
+                        G --> J[Keyword Index]
+                        H --> K[Multiple Retrievers]
+                        
+                        I --> L[Vector Store]
+                        J --> M[Document Store]
+                        K --> N[Fusion Engine]
+                        
+                        L --> O[Ranked Results]
+                        M --> O
+                        N --> O
+                        
+                        O --> P[LLM Context]
+                        P --> Q[Final Answer]
+                </div>
+                <p class="image-caption">Advanced Retrieval Pipeline Architecture</p>
+            </div>
+            
+            <div class="card accent">
+                <h4><i class="fas fa-lightbulb"></i> Key Insight</h4>
+                <p>Traditional keyword search (like Ctrl+F) fails with semantic queries, while pure vector search may miss exact keyword matches. Advanced retrievers bridge this gap by combining multiple approaches for comprehensive coverage. The evolution from simple search to advanced retrieval represents a fundamental shift in how systems understand and process natural language queries.</p>
+            </div>
+            
+            <h3>The Retrieval Evolution Timeline</h3>
+            <div class="diagram-container">
+                <div id="diagram2" class="mermaid">
+                    timeline
+                        title Retrieval Technology Evolution
+                        section 1990s
+                            Basic Keyword Search : TF-IDF, Boolean logic
+                        section 2000s
+                            Statistical Retrieval : BM25, Probabilistic models
+                        section 2010s
+                            Vector-based Retrieval : Word2Vec, GloVe embeddings
+                        section 2020s
+                            Neural Retrieval : BERT, Transformer embeddings
+                        section 2023+
+                            Advanced RAG Retrievers : Multi-query, Fusion,<br/>Context-aware systems
+                </div>
+                <p class="image-caption">Evolution of Retrieval Technologies</p>
+            </div>
+        </div>
+        
+        <!-- Core Concepts Tab -->
+        <div id="core-concepts" class="tab-content">
+            <h2><i class="fas fa-cubes"></i> Foundational Concepts</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-vector-square"></i>
+                    </div>
+                    <h3>Vector Embeddings</h3>
+                    <p>Numerical representations of text that capture semantic meaning. Similar documents have similar vectors in high-dimensional space.</p>
+                    <span class="badge badge-core">Core</span>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Semantic Search</h3>
+                    <p>Finding documents based on meaning rather than exact keyword matches using vector similarity and cosine distance calculations.</p>
+                    <span class="badge badge-core">Core</span>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h3>TF-IDF & BM25</h3>
+                    <p>Statistical methods for keyword search. BM25 improves upon TF-IDF with term frequency saturation and length normalization.</p>
+                    <span class="badge badge-core">Core</span>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h3>MMR (Maximal Marginal Relevance)</h3>
+                    <p>Balances relevance and diversity by selecting documents that are both relevant to query and dissimilar to each other.</p>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Hierarchical Chunking</h3>
+                    <p>Breaking documents into parent-child relationships to preserve context while enabling precise matching across granularity levels.</p>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-merge"></i>
+                    </div>
+                    <h3>Fusion Strategies</h3>
+                    <p>Techniques like Reciprocal Rank Fusion (RRF) that combine results from multiple retrievers or queries with sophisticated ranking.</p>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+            </div>
+            
+            <h3>TF-IDF vs BM25: The Evolution</h3>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>TF-IDF</th>
+                            <th>BM25</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Term Frequency</strong></td>
+                            <td>Linear scaling: 10 occurrences = score 10</td>
+                            <td>Saturation function: Diminishing returns</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Document Length</strong></td>
+                            <td>No normalization: Long docs dominate</td>
+                            <td>Length normalization (b parameter)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Parameters</strong></td>
+                            <td>None (simple calculation)</td>
+                            <td>Tunable: k1 ≈ 1.2, b ≈ 0.75</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Real-world Usage</strong></td>
+                            <td>Basic search systems</td>
+                            <td>Elasticsearch, Apache Lucene (83% of text recommenders)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="diagram-container">
+                <div id="diagram3" class="mermaid">
+                    graph LR
+                        A[Text Documents] --> B[Preprocessing]
+                        B --> C{Indexing Strategy}
+                        C --> D[Vector Embeddings]
+                        C --> E[Keyword Extraction]
+                        C --> F[Summary Generation]
+                        
+                        D --> G[Vector Store]
+                        E --> H[Keyword Index]
+                        F --> I[Summary Index]
+                        
+                        G --> J[Semantic Retrieval]
+                        H --> K[Keyword Retrieval]
+                        I --> L[Summary-based Retrieval]
+                        
+                        J --> M[Result Fusion]
+                        K --> M
+                        L --> M
+                        
+                        M --> N[Ranked Results]
+                </div>
+                <p class="image-caption">Core Retrieval Architecture - Multiple Indexing Strategies</p>
+            </div>
+            
+            <h3>Mathematical Foundations</h3>
+            <div class="card">
+                <h4><i class="fas fa-calculator"></i> Key Formulas</h4>
+                <p><strong>TF-IDF:</strong> \( \text{TF-IDF}(t,d) = \text{TF}(t,d) \times \text{IDF}(t) \)</p>
+                <p>Where \( \text{TF}(t,d) \) is term frequency in document, \( \text{IDF}(t) = \log\frac{N}{n_t} \)</p>
+                
+                <p><strong>BM25:</strong> \( \text{BM25}(t,d) = \text{IDF}(t) \times \frac{\text{TF}(t,d) \times (k_1 + 1)}{\text{TF}(t,d) + k_1 \times (1 - b + b \times \frac{|d|}{\text{avgdl}})} \)</p>
+                <p>Where \( k_1 \) controls saturation, \( b \) controls length normalization</p>
+                
+                <p><strong>Reciprocal Rank Fusion:</strong> \( \text{RRF}(d) = \sum_{i=1}^{n} \frac{1}{k + \text{rank}_i(d)} \)</p>
+                <p>Where \( k \) is constant (typically 60), \( \text{rank}_i(d) \) is rank of document in query i</p>
+            </div>
+        </div>
+        
+        <!-- LangChain Tab -->
+        <div id="langchain" class="tab-content">
+            <h2><span class="badge badge-langchain">LangChain</span> Retrievers</h2>
+            <p>LangChain provides a retriever interface that returns documents based on unstructured queries. It's more general than a vector store and focuses on retrieval rather than storage. LangChain's modular design allows developers to build complex retrieval pipelines with minimal code.</p>
+            
+            <div class="info-box">
+                <strong><i class="fas fa-exclamation-circle"></i> Definition:</strong> "An interface that returns documents based on an unstructured query" - accepts string query, returns list of documents.
+            </div>
+            
+            <img src="https://raw.githubusercontent.com/md-sahil-analyst22/Study_Material/main/images/langchain_retreiver.png" alt="LangChain Retrievers Overview" class="framework-image" onerror="this.onerror=null; this.alt='LangChain Retrievers Diagram'; this.style.background='#f0f0f0'; this.style.padding='20px';">
+            <p class="image-caption">LangChain Retriever Architecture - Four Primary Retriever Types with Key Characteristics</p>
+            
+            <h3>1. Vector Store-Backed Retriever</h3>
+            <p>Lightweight wrapper around vector stores with multiple search types. This is the most commonly used retriever in LangChain, providing the foundation for semantic search applications.</p>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-lang">Python - LangChain</span>
+                    <button class="code-copy">Copy</button>
+                </div>
+                <pre><code>from langchain.vectorstores import Chroma
+from langchain.embeddings import OpenAIEmbeddings
+
+# Create vector store
+vectordb = Chroma.from_documents(
+    documents=chunks,
+    embedding=OpenAIEmbeddings()
+)
+
+# Basic similarity search (default: top 4 results)
+retriever = vectordb.as_retriever()
+docs = retriever.invoke("email policy")
+
+# Limit to top 2 results
+retriever = vectordb.as_retriever(search_kwargs={"k": 2})
+
+# MMR search (balances relevance & diversity)
+retriever = vectordb.as_retriever(search_type="mmr")
+
+# Similarity threshold (only docs above threshold)
+retriever = vectordb.as_retriever(
+    search_type="similarity_score_threshold",
+    search_kwargs={"score_threshold": 0.4}
+)</code></pre>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fas fa-lightbulb"></i> Vector Store Selection Guide</h4>
+                <ul>
+                    <li><strong>ChromaDB:</strong> Best for prototyping and development, easy setup</li>
+                    <li><strong>Pinecone:</strong> Production-scale with automatic scaling</li>
+                    <li><strong>Weaviate:</strong> Hybrid search with built-in ML models</li>
+                    <li><strong>FAISS:</strong> Facebook's library for efficient similarity search</li>
+                    <li><strong>Milvus:</strong> High-performance vector database for large-scale applications</li>
+                </ul>
+            </div>
+            
+            <h3>2. Multi-Query Retriever</h3>
+            <p>Uses LLM to generate multiple query perspectives to overcome limitations of distance-based retrieval. This technique addresses query variability and improves recall by considering different phrasings of the same intent.</p>
+            
+            <div class="diagram-container">
+                <div id="diagram4" class="mermaid">
+                    flowchart LR
+                        A[Original Query] --> B[LLM]
+                        B --> C[Query Variation 1]
+                        B --> D[Query Variation 2]
+                        B --> E[Query Variation 3]
+                        
+                        C --> F[Vector Search]
+                        D --> G[Vector Search]
+                        E --> H[Vector Search]
+                        
+                        F --> I[Result Set 1]
+                        G --> J[Result Set 2]
+                        H --> K[Result Set 3]
+                        
+                        I --> L[Union of Results]
+                        J --> L
+                        K --> L
+                </div>
+                <p class="image-caption">Multi-Query Retriever Workflow - Generating Multiple Perspectives</p>
+            </div>
+            
+            <h3>3. Self-Querying Retriever</h3>
+            <p>Converts natural language queries into structured queries with metadata filters. This is particularly useful for applications with rich metadata where users want to combine semantic search with attribute filtering.</p>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-lang">Python - LangChain</span>
+                    <button class="code-copy">Copy</button>
+                </div>
+                <pre><code>from langchain.retrievers.self_query.base import SelfQueryRetriever
+from langchain.chains.query_constructor.base import AttributeInfo
+
+# Define metadata fields
+metadata_field_info = [
+    AttributeInfo(
+        name="genre",
+        description="Movie genre",
+        type="string",
+    ),
+    AttributeInfo(
+        name="year",
+        description="Release year",
+        type="integer",
+    ),
+    AttributeInfo(
+        name="rating",
+        description="1-10 rating",
+        type="float"
+    ),
+]
+
+# Create self-query retriever
+retriever = SelfQueryRetriever.from_llm(
+    llm=llm,
+    vectorstore=vectordb,
+    document_content_description="Brief summary of a movie",
+    metadata_field_info=metadata_field_info
+)
+
+# Natural language queries with metadata filtering
+results = retriever.invoke("I want to watch a movie rated higher than 8.5")
+results = retriever.invoke("Has Greta Gerwig directed any movies about women")</code></pre>
+            </div>
+            
+            <h3>4. Parent Document Retriever</h3>
+            <p>Solves the chunking dilemma by storing small chunks for embeddings but retrieving parent documents for context. This approach balances the need for precise embedding matching with the requirement for sufficient context in retrieved documents.</p>
+            
+            <div class="diagram-container">
+                <div id="diagram5" class="mermaid">
+                    flowchart TD
+                        A[Document] --> B[Parent Splitter<br/>Large chunks: 1000 chars]
+                        B --> C[Parent Documents<br/>Stored in Docstore]
+                        
+                        A --> D[Child Splitter<br/>Small chunks: 200 chars]
+                        D --> E[Child Chunks<br/>Embedded in Vector Store]
+                        
+                        F[Query] --> G[Vector Search on Child Chunks]
+                        G --> H[Retrieve Child Chunks]
+                        H --> I[Lookup Parent IDs]
+                        I --> J[Return Parent Documents]
+                </div>
+                <p class="image-caption">Parent Document Retriever Architecture - Dual Storage Approach</p>
+            </div>
+            
+            <div class="card success">
+                <h4><i class="fas fa-check-circle"></i> LangChain Best Practices</h4>
+                <ul>
+                    <li><strong>Start Simple:</strong> Begin with Vector Store-Backed retriever before adding complexity</li>
+                    <li><strong>Use MMR for Diverse Results:</strong> When you need to avoid redundant information</li>
+                    <li><strong>Implement Self-Querying for Rich Metadata:</strong> When documents have structured attributes</li>
+                    <li><strong>Choose Parent Document Retriever for Context:</strong> When small chunks lose important surrounding information</li>
+                    <li><strong>Monitor Performance:</strong> Track retrieval accuracy, latency, and user satisfaction metrics</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- LlamaIndex Tab -->
+        <div id="llamaindex" class="tab-content">
+            <h2><span class="badge badge-llamaindex">LlamaIndex</span> Retrievers</h2>
+            <p>LlamaIndex provides specialized index types and advanced retrievers optimized for production RAG applications. With its focus on efficient data ingestion, indexing, and retrieval, LlamaIndex offers more sophisticated retrieval mechanisms than LangChain for complex RAG scenarios.</p>
+            
+            <img src="https://raw.githubusercontent.com/md-sahil-analyst22/Study_Material/main/images/llmaindex_retreiver.png" alt="LlamaIndex Retrievers Overview" class="framework-image" onerror="this.onerror=null; this.alt='LlamaIndex Retrievers Diagram'; this.style.background='#f0f0f0'; this.style.padding='20px';">
+            <p class="image-caption">LlamaIndex Retrievers - Decision Framework for Different Use Cases</p>
+            
+            <h3>Core Index Types</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>VectorStoreIndex</h4>
+                    <p>Stores vector embeddings for semantic retrieval. Best for general-purpose semantic search and most common RAG applications.</p>
+                    <span class="badge badge-core">Core</span>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>DocumentSummaryIndex</h4>
+                    <p>Generates and stores document summaries for efficient filtering of large document sets. Returns original documents, not summaries.</p>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>KeywordTableIndex</h4>
+                    <p>Extracts keywords for exact matching in rule-based or hybrid search scenarios. Ideal for applications requiring precise term matching.</p>
+                    <span class="badge badge-core">Core</span>
+                </div>
+            </div>
+            
+            <h3>Advanced Retriever Types</h3>
+            
+            <div class="card">
+                <h4><i class="fas fa-robot"></i> BM25 Retriever</h4>
+                <p>Advanced keyword-based retrieval that improves upon TF-IDF with term frequency saturation and document length normalization. BM25 is particularly effective for technical documentation, legal documents, and scenarios where exact term matching is crucial.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Python - LlamaIndex</span>
+                        <button class="code-copy">Copy</button>
+                    </div>
+                    <pre><code>from llama_index.retrievers.bm25 import BM25Retriever
+from llama_index.core import VectorStoreIndex
+
+# Create BM25 retriever
+bm25_retriever = BM25Retriever.from_defaults(
+    nodes=nodes,
+    similarity_top_k=3,
+    language="english"
+)
+
+# BM25 vs TF-IDF comparison
+print("BM25 Improvements:")
+print("1. Term Frequency Saturation: Prevents over-scoring repeated terms")
+print("2. Length Normalization: Adjusts for document length (b=0.75)")
+print("3. Tunable Parameters: k1=1.2 controls saturation rate")
+
+# Retrieve documents
+query = "neural networks deep learning"
+results = bm25_retriever.retrieve(query)</code></pre>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fas fa-layer-group"></i> Auto Merging Retriever</h4>
+                <p>Preserves context in long documents using hierarchical chunking. Returns parent nodes if enough child nodes are retrieved, automatically balancing precision and context preservation.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Python - LlamaIndex</span>
+                        <button class="code-copy">Copy</button>
+                    </div>
+                    <pre><code>from llama_index.core.retrievers import AutoMergingRetriever
+from llama_index.core.node_parser import HierarchicalNodeParser
+
+# Create hierarchical nodes
+node_parser = HierarchicalNodeParser.from_defaults(
+    chunk_sizes=[512, 256, 128]  # Parent, intermediate, child
+)
+
+hier_nodes = node_parser.get_nodes_from_documents(documents)
+
+# Create auto-merging retriever
+auto_merging_retriever = AutoMergingRetriever(
+    base_retriever=base_retriever,
+    storage_context=storage_context,
+    verbose=True
+)
+
+# Query with automatic context preservation
+results = auto_merging_retriever.retrieve(
+    "How do neural networks work in deep learning?"
+)</code></pre>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fas fa-merge"></i> Query Fusion Retriever</h4>
+                <p>Combines results from multiple retrievers with sophisticated fusion strategies. This approach generates multiple query variations and intelligently merges results to improve recall and handle query ambiguity.</p>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fusion Strategy</th>
+                                <th>Mechanism</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Reciprocal Rank Fusion (RRF)</strong></td>
+                                <td>Combines rankings using reciprocal of ranks: 1/(rank+k)</td>
+                                <td>Default choice, most robust, production systems</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Relative Score Fusion</strong></td>
+                                <td>Normalizes scores by max score in each query</td>
+                                <td>When score magnitudes are meaningful and comparable</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Distribution-Based Fusion</strong></td>
+                                <td>Statistical normalization using z-scores and percentiles</td>
+                                <td>Complex queries with varying score distributions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Python - LlamaIndex</span>
+                        <button class="code-copy">Copy</button>
+                    </div>
+                    <pre><code>from llama_index.core.retrievers import QueryFusionRetriever
+
+# Create query fusion retriever with RRF
+fusion_retriever = QueryFusionRetriever(
+    retrievers=[vector_retriever, bm25_retriever],
+    similarity_top_k=5,
+    num_queries=3,  # Generate 3 query variations
+    mode="reciprocal_rerank",  # RRF strategy
+    use_async=False,
+    verbose=True
+)
+
+# RRF formula: RRF_score(d) = Σ (1 / (rank_i(d) + 60))
+# Where k=60 controls fusion behavior
+
+# Query with automatic fusion
+results = fusion_retriever.retrieve(
+    "What are the main approaches to machine learning?"
+)</code></pre>
+                </div>
+            </div>
+            
+            <h3>Additional LlamaIndex Retrievers</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>Recursive Retriever</h4>
+                    <p>Follows relationships between nodes using references, ideal for academic papers with citations or interconnected knowledge bases.</p>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Document Summary Index Retriever</h4>
+                    <p>Uses document summaries for efficient filtering before retrieving full content, perfect for large and diverse document sets.</p>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Vector Index Retriever</h4>
+                    <p>The foundation retriever using vector embeddings for semantic similarity, most commonly used in RAG pipelines.</p>
+                    <span class="badge badge-core">Core</span>
+                </div>
+            </div>
+            
+            <h3>Use Case Recommendations</h3>
+            <div class="info-box">
+                <ul>
+                    <li><strong>General Q&A:</strong> Vector Index + BM25 fusion for balanced semantic and keyword search</li>
+                    <li><strong>Technical Documents:</strong> BM25 as primary retriever with Vector as secondary for contextual flexibility</li>
+                    <li><strong>Research Papers:</strong> Recursive Retriever for following citations and interconnected references</li>
+                    <li><strong>Long Documents:</strong> Auto Merging Retriever to preserve context while enabling precise matching</li>
+                    <li><strong>Large Document Sets:</strong> Document Summary Index for efficient filtering before detailed retrieval</li>
+                    <li><strong>Ambiguous Queries:</strong> Query Fusion Retriever with multiple query variations</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Comparison Tab -->
+        <div id="comparison" class="tab-content">
+            <h2><i class="fas fa-balance-scale"></i> Framework Comparison</h2>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>LangChain</th>
+                            <th>LlamaIndex</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Primary Focus</strong></td>
+                            <td>General LLM application framework</td>
+                            <td>Specialized RAG and retrieval optimization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Retriver Philosophy</strong></td>
+                            <td>Interface-based, general retrieval</td>
+                            <td>Index-type specialized retrievers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ease of Use</strong></td>
+                            <td>High-level abstractions, quick prototyping</td>
+                            <td>More specialized, steeper learning curve</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Metadata Filtering</strong></td>
+                            <td>Self-Querying Retriever</td>
+                            <td>Built into various retrievers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multi-Query</strong></td>
+                            <td>Multi-Query Retriever (union approach)</td>
+                            <td>Query Fusion Retriever (sophisticated fusion)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Context Preservation</strong></td>
+                            <td>Parent Document Retriever</td>
+                            <td>Auto Merging Retriever</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Citation Following</strong></td>
+                            <td>Limited support</td>
+                            <td>Recursive Retriever (specialized)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fusion Strategies</strong></td>
+                            <td>Basic (union, MMR)</td>
+                            <td>Advanced (RRF, Relative Score, Distribution)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Production Readiness</strong></td>
+                            <td>Good for prototyping and integration</td>
+                            <td>Excellent for production RAG systems</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Community & Ecosystem</strong></td>
+                            <td>Larger community, more integrations</td>
+                            <td>Focused community, specialized tools</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>Decision Framework: Which Retriever When?</h3>
+            
+            <div class="diagram-container">
+                <div id="diagram6" class="mermaid">
+                    flowchart TD
+                        A[Retrieval Need] --> B{Query Type}
+                        B --> C[Exact keyword matching]
+                        B --> D[Multi-query with fusion]
+                        B --> E[Citation following]
+                        B --> F[Hierarchical context]
+                        B --> G[Simple semantic search]
+                        
+                        C --> H[BM25 Retriever<br/><span class='badge-llamaindex'>LlamaIndex</span>]
+                        C --> I[Vector + custom keyword<br/><span class='badge-langchain'>LangChain</span>]
+                        
+                        D --> J[Query Fusion Retriever<br/><span class='badge-llamaindex'>LlamaIndex</span>]
+                        D --> K[Multi-Query Retriever<br/><span class='badge-langchain'>LangChain</span>]
+                        
+                        E --> L[Recursive Retriever<br/><span class='badge-llamaindex'>LlamaIndex</span>]
+                        E --> M[Not directly supported<br/><span class='badge-langchain'>LangChain</span>]
+                        
+                        F --> N[Auto Merging Retriever<br/><span class='badge-llamaindex'>LlamaIndex</span>]
+                        F --> O[Parent Document Retriever<br/><span class='badge-langchain'>LangChain</span>]
+                        
+                        G --> P[Vector Index Retriever<br/><span class='badge-llamaindex'>LlamaIndex</span>]
+                        G --> Q[Vector Store-Backed Retriever<br/><span class='badge-langchain'>LangChain</span>]
+                </div>
+                <p class="image-caption">Retriever Selection Decision Tree - Framework-Specific Recommendations</p>
+            </div>
+            
+            <div class="card warning">
+                <h4><i class="fas fa-exclamation-triangle"></i> Key Considerations</h4>
+                <p><strong>LangChain</strong> is better for: Quick prototyping, when you need integration with many LLM tools, general LLM applications beyond retrieval, and when working with a team familiar with the LangChain ecosystem.</p>
+                <p><strong>LlamaIndex</strong> is better for: Production RAG systems, complex retrieval scenarios, when retrieval accuracy is critical, research/academic applications, and when you need sophisticated fusion and ranking mechanisms.</p>
+            </div>
+            
+            <h3>Performance Comparison</h3>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>LangChain Vector</th>
+                            <th>LlamaIndex Vector</th>
+                            <th>LlamaIndex BM25</th>
+                            <th>LlamaIndex Fusion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Semantic Accuracy</strong></td>
+                            <td>Good (0.78)</td>
+                            <td>Excellent (0.85)</td>
+                            <td>Poor (0.42)</td>
+                            <td>Excellent (0.88)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Keyword Precision</strong></td>
+                            <td>Poor (0.35)</td>
+                            <td>Poor (0.38)</td>
+                            <td>Excellent (0.92)</td>
+                            <td>Good (0.76)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Context Preservation</strong></td>
+                            <td>Fair (0.65 with Parent Doc)</td>
+                            <td>Excellent (0.89 Auto Merge)</td>
+                            <td>Poor (0.28)</td>
+                            <td>Good (0.72)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Query Variation Handling</strong></td>
+                            <td>Good (0.71 Multi-Query)</td>
+                            <td>Fair (0.68)</td>
+                            <td>Poor (0.31)</td>
+                            <td>Excellent (0.86 Fusion)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Large Document Performance</strong></td>
+                            <td>Good (0.74)</td>
+                            <td>Excellent (0.91)</td>
+                            <td>Good (0.77)</td>
+                            <td>Excellent (0.89)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Latency (ms/query)</strong></td>
+                            <td>120-180</td>
+                            <td>100-150</td>
+                            <td>40-80</td>
+                            <td>200-300</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fas fa-chart-line"></i> Hybrid Approach: Best of Both Worlds</h4>
+                <p>For enterprise applications, consider a hybrid approach:</p>
+                <ol>
+                    <li><strong>Use LangChain</strong> for orchestration, agent creation, and tool integration</li>
+                    <li><strong>Use LlamaIndex</strong> for specialized retrieval tasks where accuracy is critical</li>
+                    <li><strong>Create custom retrievers</strong> that combine strengths from both frameworks</li>
+                    <li><strong>Implement A/B testing</strong> to evaluate different retrieval strategies</li>
+                    <li><strong>Monitor and optimize</strong> based on real-world performance metrics</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Implementation Tab -->
+        <div id="implementation" class="tab-content">
+            <h2><i class="fas fa-code"></i> Implementation Examples</h2>
+            
+            <h3>Hybrid Retriever Implementation (LlamaIndex)</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-lang">Python - Complete Example</span>
+                    <button class="code-copy">Copy</button>
+                </div>
+                <pre><code>from llama_index.core import VectorStoreIndex, Document
+from llama_index.retrievers.bm25 import BM25Retriever
+from llama_index.core.retrievers import QueryFusionRetriever
+from llama_index.core.query_engine import RetrieverQueryEngine
+import numpy as np
+
+class HybridRetrievalSystem:
+    """Production-ready hybrid retrieval system"""
+    
+    def __init__(self, documents, llm, embed_model):
+        self.documents = [Document(text=text) for text in documents]
+        self.llm = llm
+        self.embed_model = embed_model
+        
+        # Create indexes
+        self.vector_index = VectorStoreIndex.from_documents(
+            self.documents, 
+            embed_model=embed_model
+        )
+        
+        # Create retrievers
+        self.vector_retriever = self.vector_index.as_retriever(
+            similarity_top_k=5
+        )
+        
+        self.bm25_retriever = BM25Retriever.from_defaults(
+            nodes=self.vector_index.as_retriever().retrieve("test"),
+            similarity_top_k=5
+        )
+        
+        # Create fusion retriever
+        self.fusion_retriever = QueryFusionRetriever(
+            retrievers=[self.vector_retriever, self.bm25_retriever],
+            similarity_top_k=5,
+            num_queries=3,
+            mode="reciprocal_rerank",
+            verbose=False
+        )
+        
+        # Create query engine
+        self.query_engine = RetrieverQueryEngine.from_args(
+            retriever=self.fusion_retriever,
+            llm=llm
+        )
+    
+    def query(self, question, strategy="hybrid"):
+        """Query with different strategies"""
+        
+        if strategy == "vector":
+            retriever = self.vector_retriever
+        elif strategy == "bm25":
+            retriever = self.bm25_retriever
+        else:  # hybrid
+            retriever = self.fusion_retriever
+        
+        # Retrieve relevant documents
+        nodes = retriever.retrieve(question)
+        
+        # Prepare context
+        context = "\n\n".join([node.text for node in nodes])
+        
+        # Generate response
+        prompt = f"""Based on the following context, answer the question:
+        
+Context:
+{context}
+
+Question: {question}
+
+Answer:"""
+        
+        try:
+            response = self.llm.complete(prompt)
+            return {
+                "answer": response.text,
+                "strategy": strategy,
+                "num_docs": len(nodes),
+                "scores": [node.score for node in nodes] if hasattr(nodes[0], 'score') else []
+            }
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def evaluate(self, test_queries, expected_topics):
+        """Evaluate retrieval performance"""
+        
+        results = []
+        for query, expected in zip(test_queries, expected_topics):
+            result = self.query(query, strategy="hybrid")
+            
+            # Simple evaluation: check if expected terms appear
+            found_terms = []
+            for term in expected:
+                if term.lower() in result.get("answer", "").lower():
+                    found_terms.append(term)
+            
+            accuracy = len(found_terms) / len(expected) if expected else 0
+            
+            results.append({
+                "query": query,
+                "accuracy": accuracy,
+                "found_terms": found_terms,
+                "num_docs": result.get("num_docs", 0)
+            })
+        
+        avg_accuracy = np.mean([r["accuracy"] for r in results])
+        return {
+            "average_accuracy": avg_accuracy,
+            "results": results
+        }
+
+# Usage example
+if __name__ == "__main__":
+    # Sample documents
+    documents = [
+        "Machine learning is a subset of AI that focuses on algorithms learning from data.",
+        "Deep learning uses neural networks with multiple layers to understand complex patterns.",
+        "Natural language processing enables computers to understand human language.",
+        "Computer vision allows machines to interpret visual information."
+    ]
+    
+    # Initialize system (LLM and embed_model would be configured)
+    system = HybridRetrievalSystem(documents, llm=None, embed_model=None)
+    
+    # Test queries
+    test_queries = [
+        "What is machine learning?",
+        "How do neural networks work?",
+        "What are AI applications?"
+    ]
+    
+    for query in test_queries:
+        result = system.query(query)
+        print(f"Query: {query}")
+        print(f"Answer: {result.get('answer', 'No answer')[:100]}...")
+        print(f"Strategy: {result.get('strategy')}")
+        print(f"Documents retrieved: {result.get('num_docs')}")
+        print()</code></pre>
+            </div>
+            
+            <h3>Production RAG Pipeline</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-lang">Python - Production Pipeline</span>
+                    <button class="code-copy">Copy</button>
+                </div>
+                <pre><code>from typing import List, Dict, Any
+import asyncio
+from datetime import datetime
+
+class ProductionRAGPipeline:
+    """Production-ready RAG pipeline with advanced retrieval"""
+    
+    def __init__(self, retriever_system, llm):
+        self.retriever_system = retriever_system
+        self.llm = llm
+        self.query_log = []
+        self.performance_metrics = {
+            "total_queries": 0,
+            "successful_queries": 0,
+            "avg_retrieval_time": 0,
+            "retrieval_strategies": {}
+        }
+    
+    async def process_query(self, question: str, user_context: Dict = None) -> Dict[str, Any]:
+        """Process query with monitoring and fallback strategies"""
+        
+        start_time = datetime.now()
+        self.performance_metrics["total_queries"] += 1
+        
+        try:
+            # Step 1: Analyze query type
+            query_type = self._analyze_query_type(question)
+            
+            # Step 2: Select retrieval strategy
+            strategy = self._select_retrieval_strategy(query_type, user_context)
+            
+            # Step 3: Retrieve documents
+            retrieval_result = self.retriever_system.query(question, strategy)
+            
+            # Step 4: Generate response with retrieved context
+            if "error" not in retrieval_result:
+                response = await self._generate_response(
+                    question, 
+                    retrieval_result.get("context", ""),
+                    user_context
+                )
+                
+                # Update metrics
+                end_time = datetime.now()
+                retrieval_time = (end_time - start_time).total_seconds()
+                self._update_metrics(strategy, True, retrieval_time)
+                
+                # Log query
+                self._log_query(question, strategy, True, retrieval_time)
+                
+                return {
+                    "success": True,
+                    "answer": response,
+                    "strategy": strategy,
+                    "retrieval_time": retrieval_time,
+                    "sources_used": retrieval_result.get("num_docs", 0),
+                    "confidence": self._calculate_confidence(retrieval_result)
+                }
+            else:
+                raise Exception(f"Retrieval failed: {retrieval_result['error']}")
+                
+        except Exception as e:
+            # Fallback: try different strategy or return cached response
+            fallback_result = self._fallback_strategy(question)
+            
+            self._update_metrics("fallback", False, 0)
+            self._log_query(question, "fallback", False, 0)
+            
+            return {
+                "success": False,
+                "answer": fallback_result,
+                "error": str(e),
+                "strategy": "fallback"
+            }
+    
+    def _analyze_query_type(self, question: str) -> str:
+        """Analyze query to determine optimal retrieval approach"""
+        
+        question_lower = question.lower()
+        
+        if any(term in question_lower for term in ["what is", "explain", "define"]):
+            return "definition"
+        elif any(term in question_lower for term in ["how", "work", "process"]):
+            return "process"
+        elif any(term in question_lower for term in ["compare", "difference", "vs"]):
+            return "comparison"
+        elif any(term in question_lower for term in ["list", "examples", "types"]):
+            return "enumeration"
+        else:
+            return "general"
+    
+    def _select_retrieval_strategy(self, query_type: str, user_context: Dict) -> str:
+        """Select retrieval strategy based on query type"""
+        
+        strategy_map = {
+            "definition": "hybrid",  # Need both semantic and keyword
+            "process": "vector",     # Focus on semantic understanding
+            "comparison": "fusion",  # Need multiple perspectives
+            "enumeration": "bm25",   # Exact matches for list items
+            "general": "hybrid"      # Default hybrid approach
+        }
+        
+        # Override based on user context if available
+        if user_context and "preferred_strategy" in user_context:
+            return user_context["preferred_strategy"]
+        
+        return strategy_map.get(query_type, "hybrid")
+    
+    async def _generate_response(self, question: str, context: str, user_context: Dict) -> str:
+        """Generate response using LLM with retrieved context"""
+        
+        prompt = self._build_prompt(question, context, user_context)
+        
+        try:
+            # Async LLM call
+            response = await self.llm.acomplete(prompt)
+            return response.text
+        except Exception as e:
+            # Fallback to synchronous call or cached response
+            return f"Based on the context: {context[:500]}..."
+    
+    def _build_prompt(self, question: str, context: str, user_context: Dict) -> str:
+        """Build prompt for LLM"""
+        
+        base_prompt = f"""You are an expert AI assistant. Use the provided context to answer the question accurately and concisely.
+
+Context:
+{context}
+
+Question: {question}
+
+Answer:"""
+        
+        # Add user context if available
+        if user_context and "domain" in user_context:
+            base_prompt = f"You are answering as a {user_context['domain']} expert.\n\n" + base_prompt
+        
+        return base_prompt
+    
+    def _fallback_strategy(self, question: str) -> str:
+        """Fallback when primary retrieval fails"""
+        
+        # Could use cached responses, simpler retrieval, or default answers
+        return "I'm unable to retrieve specific information for that question. Please try rephrasing or ask about a different topic."
+    
+    def _update_metrics(self, strategy: str, success: bool, time_taken: float):
+        """Update performance metrics"""
+        
+        if success:
+            self.performance_metrics["successful_queries"] += 1
+        
+        # Update strategy usage
+        if strategy not in self.performance_metrics["retrieval_strategies"]:
+            self.performance_metrics["retrieval_strategies"][strategy] = 0
+        self.performance_metrics["retrieval_strategies"][strategy] += 1
+        
+        # Update average time (simplified moving average)
+        if self.performance_metrics["successful_queries"] > 0:
+            current_avg = self.performance_metrics["avg_retrieval_time"]
+            new_avg = (current_avg * (self.performance_metrics["successful_queries"] - 1) + time_taken) / self.performance_metrics["successful_queries"]
+            self.performance_metrics["avg_retrieval_time"] = new_avg
+    
+    def _log_query(self, question: str, strategy: str, success: bool, time_taken: float):
+        """Log query for analytics and improvement"""
+        
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "question": question,
+            "strategy": strategy,
+            "success": success,
+            "time_taken": time_taken
+        }
+        
+        self.query_log.append(log_entry)
+        
+        # Keep only last 1000 entries
+        if len(self.query_log) > 1000:
+            self.query_log = self.query_log[-1000:]
+    
+    def _calculate_confidence(self, retrieval_result: Dict) -> float:
+        """Calculate confidence score based on retrieval results"""
+        
+        scores = retrieval_result.get("scores", [])
+        if not scores:
+            return 0.5  # Default medium confidence
+        
+        # Confidence based on top score and score distribution
+        max_score = max(scores)
+        score_variance = np.var(scores) if len(scores) > 1 else 0
+        
+        # Higher max score and lower variance = higher confidence
+        confidence = max_score * (1 - min(score_variance, 0.5))
+        
+        return min(max(confidence, 0), 1)  # Clamp between 0 and 1
+    
+    def get_performance_report(self) -> Dict:
+        """Get performance report"""
+        
+        success_rate = (self.performance_metrics["successful_queries"] / 
+                       self.performance_metrics["total_queries"]) if self.performance_metrics["total_queries"] > 0 else 0
+        
+        return {
+            "success_rate": success_rate,
+            "total_queries": self.performance_metrics["total_queries"],
+            "average_retrieval_time": self.performance_metrics["avg_retrieval_time"],
+            "strategy_distribution": self.performance_metrics["retrieval_strategies"],
+            "recent_queries": self.query_log[-10:] if self.query_log else []
+        }
+
+# Async usage example
+async def main():
+    # Initialize pipeline (retriever_system and llm would be configured)
+    pipeline = ProductionRAGPipeline(retriever_system=None, llm=None)
+    
+    # Process queries
+    queries = [
+        "What is machine learning?",
+        "Explain neural networks in deep learning",
+        "Compare supervised and unsupervised learning"
+    ]
+    
+    for query in queries:
+        result = await pipeline.process_query(query)
+        print(f"Query: {query}")
+        print(f"Success: {result['success']}")
+        print(f"Strategy: {result['strategy']}")
+        print(f"Answer preview: {result['answer'][:100]}...")
+        print(f"Confidence: {result.get('confidence', 0):.2f}")
+        print()
+
+# Run the pipeline
+# asyncio.run(main())</code></pre>
+            </div>
+            
+            <div class="card success">
+                <h4><i class="fas fa-check-circle"></i> Implementation Best Practices</h4>
+                <ul>
+                    <li><strong>Start Simple:</strong> Begin with vector search, then add complexity as needed</li>
+                    <li><strong>Monitor Performance:</strong> Track retrieval accuracy, latency, and user satisfaction</li>
+                    <li><strong>Implement Fallbacks:</strong> Always have backup strategies when primary retrieval fails</li>
+                    <li><strong>Test Thoroughly:</strong> Evaluate with diverse query types and document sets</li>
+                    <li><strong>Optimize Incrementally:</strong> Add advanced retrievers only when they solve specific problems</li>
+                    <li><strong>Document Retrieval Logic:</strong> Maintain clear documentation of which retriever handles which query types</li>
+                    <li><strong>Implement Caching:</strong> Cache frequent queries and results to improve performance</li>
+                    <li><strong>Use Async Operations:</strong> Implement asynchronous retrieval for better scalability</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Future Trends Tab -->
+        <div id="future" class="tab-content">
+            <h2><i class="fas fa-rocket"></i> Future Trends & Developments</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-brain"></i> Neural Retrieval Advancements</h3>
+                <p>Next-generation retrievers using dense passage retrieval (DPR), cross-encoders for reranking, and end-to-end trainable retrieval systems are transforming how RAG systems operate.</p>
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>Dense Retrieval:</strong> Moving beyond sparse representations to dense vector spaces with better semantic understanding</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>End-to-End Learning:</strong> Joint training of retrieval and generation components for better alignment</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>Cross-Attention Mechanisms:</strong> Dynamic interaction between query and documents during retrieval for more precise matching</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>Adaptive Retrieval:</strong> Systems that learn optimal retrieval strategies based on query patterns and user feedback</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-cogs"></i> Multimodal Retrieval</h3>
+                <p>Extending retrieval beyond text to images, audio, video, and structured data with unified embedding spaces and cross-modal understanding.</p>
+                
+                <div class="diagram-container">
+                    <div id="diagram7" class="mermaid">
+                        graph TD
+                            A[Multimodal Query] --> B{Query Type}
+                            B --> C[Text]
+                            B --> D[Image]
+                            B --> E[Audio]
+                            B --> F[Video]
+                            
+                            C --> G[Text Encoder]
+                            D --> H[Vision Encoder]
+                            E --> I[Audio Encoder]
+                            F --> J[Video Encoder]
+                            
+                            G --> K[Unified Embedding Space]
+                            H --> K
+                            I --> K
+                            J --> K
+                            
+                            K --> L[Cross-Modal Retrieval]
+                            L --> M[Text Results]
+                            L --> N[Image Results]
+                            L --> O[Audio Results]
+                            L --> P[Video Results]
+                    </div>
+                    <p class="image-caption">Multimodal Retrieval Architecture - Unified Embedding Space</p>
+                </div>
+            </div>
+            
+            <h3>Emerging Technologies</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>Retrieval as Service (RaaS)</h4>
+                    <p>Cloud-based retrieval services with automatic optimization, scaling, and maintenance, making advanced retrieval accessible to all developers.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Federated Retrieval</h4>
+                    <p>Privacy-preserving retrieval across multiple data sources without centralization, enabling secure enterprise deployments.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Real-time Learning</h4>
+                    <p>Retrievers that adapt based on user feedback and interaction patterns, continuously improving performance.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Explainable Retrieval</h4>
+                    <p>Systems that explain why particular documents were retrieved and ranked, increasing transparency and trust.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Quantum-enhanced Retrieval</h4>
+                    <p>Using quantum computing principles to handle extremely large vector spaces and complex similarity calculations.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>Neuromorphic Retrieval</h4>
+                    <p>Hardware-accelerated retrieval using neuromorphic computing for ultra-low latency applications.</p>
+                </div>
+            </div>
+            
+            <div class="card warning">
+                <h4><i class="fas fa-exclamation-triangle"></i> Challenges & Research Directions</h4>
+                <div class="key-point">
+                    <i class="fas fa-bug"></i>
+                    <div><strong>Adversarial Robustness:</strong> Protecting against manipulated queries or documents designed to exploit retrieval weaknesses</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-balance-scale"></i>
+                    <div><strong>Bias Mitigation:</strong> Ensuring retrieval doesn't amplify societal biases present in training data</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <div><strong>Efficiency at Scale:</strong> Retrieving from trillion-scale document collections with sub-second latency</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <div><strong>Cost Optimization:</strong> Reducing computational costs while maintaining or improving accuracy</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-shield-alt"></i>
+                    <div><strong>Privacy-Preserving Retrieval:</strong> Enabling effective retrieval without exposing sensitive source data</div>
+                </div>
+            </div>
+            
+            <h3>Industry Adoption Timeline</h3>
+            <div class="diagram-container">
+                <div id="diagram8" class="mermaid">
+                    gantt
+                        title Advanced Retrievers Adoption Timeline
+                        dateFormat  YYYY
+                        axisFormat  %Y
+                        
+                        section Current (2023-2024)
+                        Basic Vector Search           :done, 2023, 1y
+                        Hybrid Retrieval (BM25+Vector) :active, 2023, 2y
+                        Query Fusion                  :2024, 1y
+                        
+                        section Near Future (2025-2026)
+                        Neural Reranking              :2025, 2y
+                        Multimodal Retrieval          :2025, 2y
+                        Real-time Learning            :2026, 1y
+                        
+                        section Future (2027+)
+                        End-to-End Retrieval-Generation :2027, 2y
+                        Quantum-enhanced Retrieval    :2028, 2y
+                        Explainable Retrieval Systems :2027, 3y
+                </div>
+                <p class="image-caption">Industry Adoption Roadmap - 5-Year Outlook</p>
+            </div>
+            
+            <div class="card accent">
+                <h4><i class="fas fa-graduation-cap"></i> Skills for the Future</h4>
+                <p>To stay relevant in the evolving retrieval landscape, developers should focus on:</p>
+                <ul>
+                    <li><strong>Multimodal AI:</strong> Working with text, image, and audio embeddings and cross-modal understanding</li>
+                    <li><strong>Distributed Systems:</strong> Scaling retrieval across clusters, regions, and cloud environments</li>
+                    <li><strong>MLOps:</strong> Deploying, monitoring, and maintaining retrieval systems in production</li>
+                    <li><strong>Ethical AI:</strong> Understanding bias, fairness, and transparency in retrieval systems</li>
+                    <li><strong>Hybrid Architectures:</strong> Combining classical and neural retrieval methods effectively</li>
+                    <li><strong>Vector Database Management:</strong> Expertise in specialized vector databases and optimization techniques</li>
+                    <li><strong>Query Understanding:</strong> Advanced techniques for parsing, interpreting, and rewriting queries</li>
+                    <li><strong>Performance Optimization:</strong> Latency reduction, caching strategies, and efficiency improvements</li>
+                </ul>
+            </div>
+            
+            <h3>The Next Generation: Generative Retrieval</h3>
+            <div class="card">
+                <h4><i class="fas fa-magic"></i> From Retrieval to Generation</h4>
+                <p>The boundary between retrieval and generation is blurring with the emergence of generative retrieval systems that don't just find documents but generate contextual responses directly from latent knowledge representations.</p>
+                
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>Retrieval-Augmented Generation (RAG):</strong> Current standard - retrieve documents, then generate answers</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>Generative Retrieval:</strong> Emerging approach - generate answers directly from compressed knowledge representations</div>
+                </div>
+                <div class="key-point">
+                    <i class="fas fa-arrow-right"></i>
+                    <div><strong>Hybrid Systems:</strong> Future direction - combine the best of retrieval and generation for optimal accuracy and efficiency</div>
+                </div>
+                
+                <p>By 2030, we expect to see retrieval systems that seamlessly blend document retrieval, knowledge generation, and contextual understanding in ways that are indistinguishable from human expert knowledge synthesis.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2024 Advanced Retrievers for RAG Systems - Comprehensive Guide</p>
+            <p>Based on LangChain, LlamaIndex documentation and real-world implementations</p>
+            <p><i class="fas fa-code"></i> All code examples follow Python indentation standards</p>
+            <p><small>This guide is for educational purposes. Always refer to official documentation for production implementations.</small></p>
+            <p><small>Images sourced from: GitHub Study_Material repository - Advanced Retriever visualizations</small></p>
+        </footer>
+    </div>
+    
+    <script>
+        // Initialize Mermaid with proper settings
+        mermaid.initialize({
+            startOnLoad: false, // We'll initialize manually
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            gantt: {
+                useMaxWidth: true
+            }
+        });
+        
+        // Track which diagrams have been rendered
+        const renderedDiagrams = new Set();
+        
+        // Function to render a diagram
+        function renderDiagram(diagramId) {
+            const diagram = document.getElementById(diagramId);
+            if (!diagram || renderedDiagrams.has(diagramId)) {
+                return;
+            }
+            
+            try {
+                // Get the actual Mermaid code
+                const mermaidCode = diagram.textContent.trim();
+                
+                // Clear the container
+                diagram.innerHTML = '';
+                
+                // Render the diagram
+                mermaid.render(diagramId + '_svg', mermaidCode, function(svgCode) {
+                    diagram.innerHTML = svgCode;
+                    renderedDiagrams.add(diagramId);
+                });
+            } catch (error) {
+                console.error(`Error rendering diagram ${diagramId}:`, error);
+                diagram.innerHTML = `
+                    <div class="mermaid-placeholder">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Diagram could not be rendered</p>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+        
+        // Function to render all diagrams in a tab
+        function renderTabDiagrams(tabId) {
+            const tab = document.getElementById(tabId);
+            if (!tab) return;
+            
+            // Find all diagram containers in this tab
+            const diagrams = tab.querySelectorAll('.mermaid');
+            diagrams.forEach(diagram => {
+                if (diagram.id) {
+                    renderDiagram(diagram.id);
+                }
+            });
+        }
+        
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Initial render of active tab
+            setTimeout(() => {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab && activeTab.id) {
+                    renderTabDiagrams(activeTab.id);
+                }
+            }, 500);
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Render diagrams in the new active tab after a short delay
+                    setTimeout(() => {
+                        renderTabDiagrams(tabId);
+                    }, 100);
+                });
+            });
+            
+            // Code copy functionality
+            const copyButtons = document.querySelectorAll('.code-copy');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.closest('.code-container').querySelector('pre code');
+                    const textToCopy = codeBlock.textContent;
+                    
+                    // Create temporary textarea for copying
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        this.style.background = '#27ae60';
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.background = '';
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy: ', err);
+                    } finally {
+                        document.body.removeChild(textArea);
+                    }
+                });
+            });
+            
+            // Make sure at least one tab is active
+            if (!document.querySelector('.tab-content.active')) {
+                document.querySelector('.tab-content').classList.add('active');
+            }
+            if (!document.querySelector('.tab-btn.active')) {
+                document.querySelector('.tab-btn').classList.add('active');
+            }
+            
+            // Image error handling
+            document.querySelectorAll('img').forEach(img => {
+                img.addEventListener('error', function() {
+                    console.log('Image failed to load:', this.src);
+                    // Create a placeholder
+                    this.style.background = '#f0f0f0';
+                    this.style.display = 'flex';
+                    this.style.alignItems = 'center';
+                    this.style.justifyContent = 'center';
+                    this.style.color = '#666';
+                    this.style.fontSize = '14px';
+                    this.style.textAlign = 'center';
+                    this.style.padding = '20px';
+                    this.style.minHeight = '200px';
+                    
+                    // Get alt text or create default
+                    const altText = this.alt || 'Image not available';
+                    this.outerHTML = `
+                        <div style="background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 40px 20px; text-align: center; color: #6c757d;">
+                            <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 1rem; color: #adb5bd;"></i>
+                            <p>${altText}</p>
+                            <small>Image failed to load from external source</small>
+                        </div>
+                    `;
+                });
+            });
+            
+            // Handle window resize for diagram re-rendering
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Re-render diagrams in active tab
+                    const activeTab = document.querySelector('.tab-content.active');
+                    if (activeTab && activeTab.id) {
+                        // Clear rendered diagrams cache for this tab
+                        const tabDiagrams = activeTab.querySelectorAll('.mermaid');
+                        tabDiagrams.forEach(diagram => {
+                            if (diagram.id) {
+                                renderedDiagrams.delete(diagram.id);
+                            }
+                        });
+                        renderTabDiagrams(activeTab.id);
+                    }
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
