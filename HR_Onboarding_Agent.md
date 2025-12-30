@@ -203,127 +203,108 @@ graph TB
 ```mermaid
 graph TD
     %% ========== EXTERNAL ENTITIES ==========
-    CAND["👤 Candidate"]
-    HR["👔 HR Team"]
-    INT["🎤 Interviewer"]
+    CAND["👤 CANDIDATE"]
+    HR["👔 HR TEAM"]
+    INT["🎤 INTERVIEWER"]
     
-    %% ========== PROCESSES ==========
-    P1["1.0<br/>Collect Candidate<br/>Information<br/>(Forms 1-2)"]
+    %% ========== PROCESSES - VERTICAL FLOW ==========
+    P1["1.0<br/>Collect Candidate<br/>Information"]
     P2["2.0<br/>Validate<br/>Documents"]
     P3["3.0<br/>Schedule<br/>Interview"]
     P4["4.0<br/>Conduct<br/>Interview"]
-    P5["5.0<br/>Evaluate<br/>Candidate<br/>(Form-3)"]
+    P5["5.0<br/>Evaluate<br/>Candidate"]
     P6["6.0<br/>Background<br/>Verification"]
     P7["7.0<br/>Generate<br/>Offer Letter"]
-    P8["8.0<br/>Onboard<br/>Candidate<br/>(Form-4)"]
+    P8["8.0<br/>Onboard<br/>Candidate"]
     
     %% ========== DATA STORES ==========
     D1["D1: Candidate<br/>Database"]
     D2["D2: Document<br/>Repository"]
     D3["D3: Interview<br/>Schedule"]
     D4["D4: Evaluation<br/>Records"]
-    D5["D5: BG Verification<br/>Status"]
+    D5["D5: BG Verification"]
     D6["D6: Offer<br/>Letters"]
     D7["D7: Onboarding<br/>Checklist"]
-    D8["D8: Audit Log"]
+    D8["D8: Audit<br/>Log"]
     
-    %% ========== CANDIDATE FLOWS ==========
-    CAND -->|Form-1, Form-2| P1
-    CAND -->|Documents| P2
-    CAND -->|Confirmation| P3
-    CAND -->|Completes Interview| P4
-    CAND -->|Accepts Offer| P7
-    CAND -->|Form-4<br/>Induction| P8
+    %% ========== MAIN VERTICAL FLOW ==========
+    CAND -->|Form-1,2| P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> P5
+    P5 --> P6
+    P6 --> P7
+    P7 --> P8
+    P8 --> HR
     
-    %% ========== HR TEAM FLOWS ==========
-    HR -->|Screening Decision| P3
-    HR -->|Starts BG Check| P6
-    HR -->|Approves Offer| P7
-    HR -->|Onboarding Tasks| P8
+    %% ========== DATA STORE CONNECTIONS - RIGHT SIDE ==========
+    P1 -.->|Store| D1
+    P1 -.->|Log| D8
     
-    %% ========== INTERVIEWER FLOWS ==========
-    INT -->|Submits Form-3| P5
-    INT -->|Interview Notes| P4
+    P2 -.->|Store| D2
+    P2 -.->|Log| D8
     
-    %% ========== PROCESS TO DATA STORE FLOWS ==========
+    P3 -.->|Store| D3
+    P3 -.->|Log| D8
     
-    %% P1 - Collect Candidate Info
-    P1 -->|Stores Personal<br/>Details| D1
-    P1 -->|Logs Action| D8
+    P4 -.->|Log| D8
     
-    %% P2 - Validate Documents
-    P2 -->|Queries Candidate<br/>Data| D1
-    P2 -->|Stores Docs<br/>Metadata| D2
-    P2 -->|Logs Validation| D8
+    P5 -.->|Store| D4
+    P5 -.->|Log| D8
     
-    %% P3 - Schedule Interview
-    P3 -->|Queries D1| D1
-    P3 -->|Stores Schedule<br/>& QR Code| D3
-    P3 -->|Logs Schedule| D8
+    P6 -.->|Store| D5
+    P6 -.->|Log| D8
     
-    %% P4 - Conduct Interview
-    P4 -->|Reads Schedule| D3
-    P4 -->|Logs Check-in| D8
+    P7 -.->|Store| D6
+    P7 -.->|Log| D8
     
-    %% P5 - Evaluate Candidate
-    P5 -->|Reads Schedule| D3
-    P5 -->|Stores Form-3<br/>Evaluation| D4
-    P5 -->|Updates Status| D1
-    P5 -->|Logs Evaluation| D8
+    P8 -.->|Store| D7
+    P8 -.->|Log| D8
     
-    %% P6 - Background Verification
-    P6 -->|Reads Candidate<br/>Data| D1
-    P6 -->|Queries Evaluation| D4
-    P6 -->|Stores BG<br/>Status| D5
-    P6 -->|Logs BG Check| D8
+    %% ========== HR INPUT FLOWS ==========
+    HR -.->|Screening| P3
+    HR -.->|Start BG| P6
+    HR -.->|Approve| P7
+    HR -.->|Tasks| P8
     
-    %% P7 - Generate Offer Letter
-    P7 -->|Reads BG Status| D5
-    P7 -->|Queries Candidate| D1
-    P7 -->|Stores Offer<br/>Letter| D6
-    P7 -->|Logs Generation| D8
+    %% ========== INTERVIEWER INPUT FLOWS ==========
+    INT -.->|Form-3| P5
     
-    %% P8 - Onboard Candidate
-    P8 -->|Reads Offer| D6
-    P8 -->|Reads Candidate<br/>Data| D1
-    P8 -->|Stores Form-4<br/>Details| D1
-    P8 -->|Creates Checklist| D7
-    P8 -->|Logs Onboarding| D8
-    
-    %% ========== OUTPUT FLOWS ==========
-    D1 -->|Candidate Profile| HR
-    D3 -->|Interview Invites| CAND
-    D4 -->|Evaluation Report| HR
-    D5 -->|BG Report| HR
+    %% ========== OUTPUT TO CANDIDATE ==========
+    D3 -->|Interview Invite| CAND
     D6 -->|Offer Letter| CAND
     D7 -->|Onboarding Status| CAND
-    D8 -->|Audit Reports| HR
+    
+    %% ========== REPORTS TO HR ==========
+    D4 -->|Evaluation Report| HR
+    D5 -->|BG Report| HR
     
     %% ========== STYLING ==========
-    %% External Entities - Orange
-    style CAND fill:#FFA500,stroke:#FF8C00,stroke-width:2px,color:#000
-    style HR fill:#FFA500,stroke:#FF8C00,stroke-width:2px,color:#000
-    style INT fill:#FFA500,stroke:#FF8C00,stroke-width:2px,color:#000
+    %% External Entities - Orange Rectangle
+    style CAND fill:#FFA500,stroke:#FF8C00,stroke-width:3px,color:#000,font-weight:bold
+    style HR fill:#FFA500,stroke:#FF8C00,stroke-width:3px,color:#000,font-weight:bold
+    style INT fill:#FFA500,stroke:#FF8C00,stroke-width:3px,color:#000,font-weight:bold
     
-    %% Processes - Blue (Rounded)
-    style P1 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
-    style P2 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
-    style P3 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
-    style P4 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
-    style P5 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
-    style P6 fill:#FF6B6B,stroke:#CC5555,stroke-width:3px,color:#fff
-    style P7 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
-    style P8 fill:#00B4D8,stroke:#0096C7,stroke-width:3px,color:#fff
+    %% Processes - Blue (Main Flow)
+    style P1 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
+    style P2 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
+    style P3 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
+    style P4 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
+    style P5 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
+    style P6 fill:#FF6B6B,stroke:#CC5555,stroke-width:3px,color:#fff,font-weight:bold
+    style P7 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
+    style P8 fill:#1E90FF,stroke:#0047AB,stroke-width:3px,color:#fff,font-weight:bold
     
-    %% Data Stores - Purple (Parallelogram)
-    style D1 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
-    style D2 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
-    style D3 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
-    style D4 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
-    style D5 fill:#FF6B6B,stroke:#CC5555,stroke-width:2px,color:#fff
-    style D6 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
-    style D7 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
-    style D8 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff
+    %% Data Stores - Purple (Right Side)
+    style D1 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
+    style D2 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
+    style D3 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
+    style D4 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
+    style D5 fill:#FF6B6B,stroke:#CC5555,stroke-width:2px,color:#fff,font-weight:bold
+    style D6 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
+    style D7 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
+    style D8 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
 ```
 
 
