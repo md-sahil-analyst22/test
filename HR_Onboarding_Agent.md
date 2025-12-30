@@ -155,52 +155,37 @@ graph TD
 #### Level-0: System Context
 
 ```mermaid
-graph LR
-    subgraph "External Entities"
-        CAND["👤 CANDIDATE<br/>(External Entity)<br/>Job Seekers"]
-        HR["👥 HR TEAM<br/>(External Entity)<br/>Recruiters/Managers"]
-        INT["🎤 INTERVIEWER<br/>(External Entity)<br/>Interview Panel"]
+graph TB
+    subgraph entities["External Entities"]
+        direction LR
+        CAND["👤 CANDIDATE"]
+        HR["👥 HR TEAM"]
+        INT["🎤 INTERVIEWER"]
     end
     
-    subgraph "HR Onboarding Agent System"
-        PROCESS["🎯 HR ONBOARDING<br/>AGENT SYSTEM<br/>(Process 0.0)<br/>━━━━━━━━━━━━<br/>• Candidate Registration<br/>• Interview Management<br/>• Decision Processing"]
+    subgraph system["System"]
+        PROCESS["🎯 HR ONBOARDING<br/>AGENT SYSTEM<br/>Process 0.0"]
     end
     
-    subgraph "Data Stores"
-        D1["📊 D1: CANDIDATE_DATABASE<br/>• personal_details<br/>• addresses, qualifications,<br/>  skills"]
-        D2["📊 D2: APPLICATION_DATA<br/>• candidate_applications<br/>• statuses/history<br/>• status_history"]
-        D3["📊 D3: INTERVIEW_RECORDS<br/>• interviews<br/>• interviews<br/>• interview_evaluations"]
-        D4["📊 D4: DOCUMENTS_STORAGE<br/>• documents (metadata)<br/>• Supabase Blob Storage"]
-        D5["📊 D5: AUDIT_LOGS<br/>• audit_logs<br/>• user_activities"]
+    subgraph datastores["Data Stores"]
+        direction TB
+        D1["D1: CANDIDATE_DATABASE"]
+        D2["D2: APPLICATION_DATA"]
+        D3["D3: INTERVIEW_RECORDS"]
+        D4["D4: DOCUMENTS_STORAGE"]
+        D5["D5: AUDIT_LOGS"]
     end
     
-    %% Candidate flows
-    CAND -->|1.1 Application Form<br/>(Form-1, Confirmation, Invite)| PROCESS
-    PROCESS -->|Store Candidate Data| D1
+    CAND -->|1.1 Application Form| PROCESS
+    HR -->|2.1 Review & Decision| PROCESS
+    HR -->|2.2 Reports & Analytics| PROCESS
+    INT -->|3.1 Evaluation| PROCESS
     
-    %% HR Team flows
-    HR -->|2.1 Review & Decision<br/>(Form-1, Form-2)| PROCESS
-    PROCESS -->|Store Application Data| D2
-    HR -->|2.2 Reports & Analytics<br/>(Dashboard Data)| PROCESS
-    
-    %% Interviewer flows
-    INT -->|3.1 Evaluation<br/>(Form-3, Scores<br/>Dashboard Data)| PROCESS
-    PROCESS -->|Store Interview Records| D3
-    
-    %% Data flows to storage
-    PROCESS -->|Store Audit Logs| D5
-    PROCESS -->|Store Documents| D4
-    
-    %% Styling
-    style CAND fill:#F5D5E8,stroke:#A66BA6,stroke-width:2px,color:#000
-    style HR fill:#D4E6F1,stroke:#5B7FA6,stroke-width:2px,color:#000
-    style INT fill:#FCE4D6,stroke:#CC8B4A,stroke-width:2px,color:#000
-    style PROCESS fill:#D5F4E6,stroke:#52897B,stroke-width:3px,color:#000,font-weight:bold
-    style D1 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-    style D2 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-    style D3 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-    style D4 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-    style D5 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
+    PROCESS -->|Store Data| D1
+    PROCESS -->|Store Data| D2
+    PROCESS -->|Store Data| D3
+    PROCESS -->|Store Data| D4
+    PROCESS -->|Store Data| D5
 ```
 
 **[Diagram 2: Data Flow Level-0]**
