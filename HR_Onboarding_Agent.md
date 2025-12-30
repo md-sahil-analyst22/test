@@ -200,7 +200,7 @@ graph TB
 - **Process 6:** Analytics & Reporting
 
 ---
-```
+```mermaid
 graph LR
     subgraph "External Entities"
         CAND["👤 CANDIDATE"]
