@@ -1,10 +1,4 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
 
-# now give me .md file
-
-Here is the full contents of `HR_Onboarding_Agent_v2.md` as a markdown file. You can copy‑paste this into a `.md` file locally.
-
-```markdown
 # HR Onboarding Agent - System Design Document
 
 **Document Version Control**
