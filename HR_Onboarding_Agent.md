@@ -201,101 +201,107 @@ graph TB
 
 ---
 ```mermaid
-subgraph "Data Stores"
-    D1["D1: CANDIDATE<br/>DATABASE"]
-    D2["D2: APPLICATION<br/>DATA"]
-    D3["D3: INTERVIEW<br/>RECORDS"]
-    D4["D4: DOCUMENTS<br/>STORAGE"]
-    D5["D5: AUDIT<br/>LOGS"]
-end
-
-subgraph "Processes"
-    P1["1.0<br/>Candidate<br/>Registration"]
-    P2["2.0<br/>Interview<br/>Scheduling<br/>& QR Mgmt"]
-    P3["3.0<br/>Background<br/>Verification"]
-    P4["4.0<br/>Offer<br/>Generation"]
-    P5["5.0<br/>Onboarding<br/>Task"]
-    P6["6.0<br/>Analytics &<br/>Reporting"]
-end
-
-%% ========== CANDIDATE TO PROCESSES ==========
-CAND -->|Form-1| P1
-CAND -->|Form-2| P1
-CAND -->|Form-4| P5
-CAND -->|Documents| P1
-CAND -->|Accept Offer| P4
-CAND -->|Scan QR| P2
-
-%% ========== HR TO PROCESSES ==========
-HR -->|Screening| P2
-HR -->|Schedule| P2
-HR -->|Gen QR| P2
-HR -->|Selection| P3
-HR -->|Start BG| P3
-HR -->|Complete BG| P3
-HR -->|Reports| P6
-
-%% ========== INTERVIEWER TO PROCESSES ==========
-INT -->|Form-3| P3
-INT -->|Validate QR| P2
-
-%% ========== PROCESS TO DATA STORES ==========
-P1 -->|Store| D1
-P1 -->|Log| D5
-P1 -->|Application| D2
-P1 -->|Docs| D4
-
-P2 -->|Query| D2
-P2 -->|Update| D2
-P2 -->|Interview| D3
-P2 -->|QR Code| D3
-P2 -->|Access Log| D5
-
-P3 -->|Query App| D2
-P3 -->|Update BG| D2
-P3 -->|Evals| D3
-P3 -->|Log| D5
-
-P4 -->|Query| D2
-P4 -->|Update Offer| D2
-P4 -->|PDF| D4
-P4 -->|Log| D5
-
-P5 -->|Query| D2
-P5 -->|Checklist| D2
-P5 -->|Docs| D4
-P5 -->|Log| D5
-
-P6 -->|Query| D1
-P6 -->|Query| D2
-P6 -->|Query| D3
-P6 -->|Query| D5
-
-%% ========== PROCESSES TO OUTPUT ==========
-P2 -->|QR+Invite| HR
-P2 -->|Form Links| CAND
-P4 -->|Offer Letter| CAND
-P5 -->|Status| CAND
-P6 -->|Reports| HR
-
-%% ========== STYLING ==========
-style CAND fill:#F5D5E8,stroke:#A66BA6,stroke-width:2px,color:#000
-style HR fill:#D4E6F1,stroke:#5B7FA6,stroke-width:2px,color:#000
-style INT fill:#FCE4D6,stroke:#CC8B4A,stroke-width:2px,color:#000
-
-style P1 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
-style P2 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
-style P3 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
-style P4 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
-style P5 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
-style P6 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
-
-style D1 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-style D2 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-style D3 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-style D4 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-style D5 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
-
+graph LR
+    subgraph "External Entities"
+        CAND["👤 CANDIDATE"]
+        HR["👥 HR TEAM"]
+        INT["🎤 INTERVIEWER"]
+    end
+    
+    subgraph "Data Stores"
+        D1["D1: CANDIDATE<br/>DATABASE"]
+        D2["D2: APPLICATION<br/>DATA"]
+        D3["D3: INTERVIEW<br/>RECORDS"]
+        D4["D4: DOCUMENTS<br/>STORAGE"]
+        D5["D5: AUDIT<br/>LOGS"]
+    end
+    
+    subgraph "Processes"
+        P1["1.0<br/>Candidate<br/>Registration"]
+        P2["2.0<br/>Interview<br/>Scheduling<br/>& QR Mgmt"]
+        P3["3.0<br/>Background<br/>Verification"]
+        P4["4.0<br/>Offer<br/>Generation"]
+        P5["5.0<br/>Onboarding<br/>Task"]
+        P6["6.0<br/>Analytics &<br/>Reporting"]
+    end
+    
+    %% ========== CANDIDATE TO PROCESSES ==========
+    CAND -->|Form-1| P1
+    CAND -->|Form-2| P1
+    CAND -->|Form-4| P5
+    CAND -->|Documents| P1
+    CAND -->|Accept Offer| P4
+    CAND -->|Scan QR| P2
+    
+    %% ========== HR TO PROCESSES ==========
+    HR -->|Screening| P2
+    HR -->|Schedule| P2
+    HR -->|Gen QR| P2
+    HR -->|Selection| P3
+    HR -->|Start BG| P3
+    HR -->|Complete BG| P3
+    HR -->|Reports| P6
+    
+    %% ========== INTERVIEWER TO PROCESSES ==========
+    INT -->|Form-3| P3
+    INT -->|Validate QR| P2
+    
+    %% ========== PROCESS TO DATA STORES ==========
+    P1 -->|Store| D1
+    P1 -->|Log| D5
+    P1 -->|Application| D2
+    P1 -->|Docs| D4
+    
+    P2 -->|Query| D2
+    P2 -->|Update| D2
+    P2 -->|Interview| D3
+    P2 -->|QR Code| D3
+    P2 -->|Access Log| D5
+    
+    P3 -->|Query App| D2
+    P3 -->|Update BG| D2
+    P3 -->|Evals| D3
+    P3 -->|Log| D5
+    
+    P4 -->|Query| D2
+    P4 -->|Update Offer| D2
+    P4 -->|PDF| D4
+    P4 -->|Log| D5
+    
+    P5 -->|Query| D2
+    P5 -->|Checklist| D2
+    P5 -->|Docs| D4
+    P5 -->|Log| D5
+    
+    P6 -->|Query| D1
+    P6 -->|Query| D2
+    P6 -->|Query| D3
+    P6 -->|Query| D5
+    
+    %% ========== PROCESSES TO OUTPUT ==========
+    P2 -->|QR+Invite| HR
+    P2 -->|Form Links| CAND
+    P4 -->|Offer Letter| CAND
+    P5 -->|Status| CAND
+    P6 -->|Reports| HR
+    
+    %% ========== STYLING ==========
+    style CAND fill:#F5D5E8,stroke:#A66BA6,stroke-width:2px,color:#000
+    style HR fill:#D4E6F1,stroke:#5B7FA6,stroke-width:2px,color:#000
+    style INT fill:#FCE4D6,stroke:#CC8B4A,stroke-width:2px,color:#000
+    
+    style P1 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
+    style P2 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
+    style P3 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
+    style P4 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
+    style P5 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
+    style P6 fill:#FFF9E6,stroke:#CC9900,stroke-width:3px,color:#000
+    
+    style D1 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
+    style D2 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
+    style D3 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
+    style D4 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
+    style D5 fill:#E8F4F8,stroke:#4A7BA7,stroke-width:2px,color:#000
 ```
 
 
