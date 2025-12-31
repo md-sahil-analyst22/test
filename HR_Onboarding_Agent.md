@@ -191,6 +191,8 @@ graph TB
 **[Diagram 2: Data Flow Level-0]**
 
 
+---
+
 
 #### Level-1: Detailed Processes
 
@@ -201,7 +203,6 @@ graph TB
 - **Process 5:** Onboarding Task Tracking & Form-4 Completion
 - **Process 6:** Analytics & Reporting
 
----
 
 ```mermaid
 graph TD
@@ -321,6 +322,11 @@ graph TD
 | 🔵 **Blue** | Processes (1.0-8.0) | Main business operations |
 | 🔴 **Red** | Process 6.0 + D5 | Critical: Background Verification |
 | 🟣 **Purple** | Data Stores (D1-D8) | Databases & storage |
+
+
+
+---
+---
 
 
 ### 2.2 Technology Stack and Architecture
