@@ -190,6 +190,8 @@ graph TB
 
 **[Diagram 2: Data Flow Level-0]**
 
+
+
 #### Level-1: Detailed Processes
 
 - **Process 1:** Candidate Registration (Forms 1-4)
@@ -308,7 +310,10 @@ graph TD
     style D8 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
 ```
 
-## 📋 Color Coding
+**[Diagram 2: Data Flow Level-1]**
+
+
+#### 📋 Color Coding
 
 | Color | Element | Meaning |
 |-------|---------|---------|
