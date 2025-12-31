@@ -200,6 +200,7 @@ graph TB
 - **Process 6:** Analytics & Reporting
 
 ---
+
 ```mermaid
 graph TD
     %% ========== EXTERNAL ENTITIES ==========
@@ -307,6 +308,14 @@ graph TD
     style D8 fill:#9D4EDD,stroke:#7B2CBF,stroke-width:2px,color:#fff,font-weight:bold
 ```
 
+## 📋 Color Coding
+
+| Color | Element | Meaning |
+|-------|---------|---------|
+| 🟠 **Orange** | External Entities | Candidate, HR, Interviewer |
+| 🔵 **Blue** | Processes (1.0-8.0) | Main business operations |
+| 🔴 **Red** | Process 6.0 + D5 | Critical: Background Verification |
+| 🟣 **Purple** | Data Stores (D1-D8) | Databases & storage |
 
 
 ### 2.2 Technology Stack and Architecture
