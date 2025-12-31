@@ -326,7 +326,6 @@ graph TD
 
 
 ---
----
 
 
 ### 2.2 Technology Stack and Architecture
@@ -392,6 +391,9 @@ graph TB
 | Security & Compliance Team | Verify encryption, access control, and data retention |
 | IT & DevOps Team | Manage deployment, monitoring, and version control |
 | Management / Stakeholders | Approve scope, KPIs, and release milestones |
+
+
+
 
 ---
 
